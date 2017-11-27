@@ -2,7 +2,7 @@ def generate_new_users(Eta, A, S, N_new, T_new):
     '''
     Generates new random user
     
-    s
+    
     Inputs:
         Eta: Residuals
         A: Actions
