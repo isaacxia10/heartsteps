@@ -1,0 +1,60 @@
+%!TEX root = ../thesis.tex
+% \begin{savequote}[75mm]
+% Nulla facilisi. In vel sem. Morbi id urna in diam dignissim feugiat. Proin molestie tortor eu velit. Aliquam erat volutpat. Nullam ultrices, diam tempus vulputate egestas, eros pede varius leo.
+% \qauthor{Quoteauthor Lastname}
+% \end{savequote}
+
+\chapter{Models}
+\label{Models}
+
+\newthought{Several different variants} of the Multi-armed Contextual Bandit algorithm were investigated to test feasibility in the HeartSteps mobile application.
+
+
+\section{Reward Generative Models}
+\label{Models/Reward Generative Models}
+
+
+\subsection{Basic Linear Generative Model}
+The most basic generative model for rewards is based on the equation:
+
+
+where we set $p_1 = 8$, $p_2 = 3$, $f_1: \mathcal{S} \to \mathbb{B}^{p_1}$ to be the identity of the $7$ features plus a bias feature, and $f_2: \mathcal{S} \to \mathbb{R}^{p_2}$ to be the identity on the first $3$ features.
+
+\subsection{Additional Models}
+
+{\color{red} Can test time-varying reward functions, or perhaps some non-identity/non-linear functions?   }
+
+\section{Bandit Algorithm Variants}
+\label{Models/Bandit Algorithm Variants}
+
+{\color{red} Can also use this section to describe motivation for each part of the Bandit algorithm.}
+
+
+We currently are using Peng's Algorithm 2 ({\bf Kristjan's Bandit Algorithm for HS2 (Action-Center Version}), which contains a Gaussian Process, a Feedback Controller based on recent dosage, probability clipping, with action centering on the Gaussian Process update.
+
+We plan on including/excluding each of the 4 modifications above (for $2^4 = 16$ slightly different variants), checking whether we need to include them or not.
+
+
+There are the following parameters to optimize:
+\begin{itemize}
+	\item Gaussian Prior parameters $(\gamma, \mu_\Theta, \Sigma_\Theta)$ (Peng uses $\mu_\beta, \Sigma_\beta$ instead)
+	\item Feedback controller parameters $(\lambda_c, N_c, T_c)$, where $N_c$ is the desired dosage (number of $1$ actions) over the past $T_c$ decision times, and $\lambda_c$ is the coefficient on how powerful the controller is
+	\item $\sigma^2$, an estimate of the reward noise variance
+	\item Probability clipping $(\pi_{\text{min}}, \pi_{\text{max}})$.  We set these to $(0.2, 0.8)$ from domain science, that we require some amount of randomization.
+	\item Baseline Features $f_1: \mathcal{S} \to \mathbb{R}^{p_1}, f_2:\mathcal{S} \to \mathbb{R}^{p_2}$.  We set these to identity functions, where $f_1$ gives a bias term plus the original $7$ context features, and $f_2$ gives the first $3$ features for interaction terms.
+\end{itemize}
+
+We aim to tune the parameters in the above order.  
+\begin{enumerate}
+	\item Tune $\gamma$ through parameter sweep on $\gamma$.
+	\item Tune $\Sigma_\Theta$ setting it to $v \mathbb{I}$, where $v \in \mathbb{R}$ is a scalar and $\mathbb{I}$ is the identity matrix; parameter sweep on $v$.
+	\item Set $\Sigma_\Theta = \Theta$ from the training data regression.
+	\item Tune $\lambda_c$ through parameter sweep on $\lambda_c$.
+	\item Tune $T_c$ through parameter sweep on $T_c$.  Will stick to some discrete values such as $(5,10,50,70)$ to not overfit.  
+	\item Tune $N_c$ setting it to $m T_c$, where $T_c$ was the optimal value from the previous tuning step, and $m$ is a scalar, likely in the range $(0.25, 0.75)$.
+	\item Set $\sigma^2$ to $\hat{\sigma^2}$, the empirical residual (noise) variance.
+	\item Set $\pi_{\text{min}} = 0.2, \pi_{\text{max}} = 0.8$.
+	\item Set $f_1, f_2$ to identity mappings.
+\end{enumerate}
+
+Quick Note: on test data (i.e. random $\mathcal{S}$ and $\Theta = 100\cdot\text{range}(11)$, and small Gaussian noise), the implemented Bandit Algorithm works very well to learn the true $\Theta$ when no action-centering occurs; otherwise, $3$ coefficients in $\Theta$ are thrown off by subtracting $\pi_t$ from $A_t$ on line $26$ in the algorithm, but the remainder are perfectly fine.

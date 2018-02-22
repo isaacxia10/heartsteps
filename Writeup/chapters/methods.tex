@@ -1,0 +1,160 @@
+%!TEX root = ../thesis.tex
+% \begin{savequote}[75mm]
+% Nulla facilisi. In vel sem. Morbi id urna in diam dignissim feugiat. Proin molestie tortor eu velit. Aliquam erat volutpat. Nullam ultrices, diam tempus vulputate egestas, eros pede varius leo.
+% \qauthor{Quoteauthor Lastname}
+% \end{savequote}
+
+\chapter{Methods}
+\label{Methods}
+
+\newthought{Throughout this project},  we work with the HeartSteps v1 Data, hereupon abbreviated HSv1.  Features have been created from the measurements through domain science, through which we assume that the Bandit algorithms use linear models for the purposes of the project.
+
+
+The overall methodology is the following.  We first designate a variant of the Bandit algorithm, as well as a `true' generative model we use to form simulated rewards from the context and given action.  Next, we split HSv1 user data into $K$-fold cross validation sets.  For each split, perform the following:
+
+\begin{enumerate}
+	\item Use the training and testing data to generate training simulated users and testing simulated users.
+	\item Use training simulated users to tune parameters of the given Bandit algorithm variation.
+	\item Run simulated users from test data, observe quality metrics.
+\end{enumerate}
+
+Each part is described in more detail below.
+
+
+  \begin{table}
+ \caption{Notations}
+ \label{Notation Table}
+ \centering \begin{tabular*}
+{0.987\textwidth}
+{|p{0.15\textwidth}|p{0.25\textwidth}|p{0.5\textwidth}|}
+\toprule
+Term & Name & Description \\
+\midrule
+$\mathcal{S}$ & Context & Set of 7 features     \\
+$p_1$ & Baseline features dimension & 7 features with 1 bias term \\
+$p_2$ & Interaction features dimension & 3 features \\
+$\mathcal{A}$ & Actions &  Binary -- active message sent, no active message sent   \\
+$\mathcal{R}$ & Reward &  Step count in $30$ minutes following decision point  \\
+$f_1 : \mathcal{S} \to \mathbb{R}^{p_1}$ & Baseline feature mapping & Maps context to baseline features \\
+$f_2 : \mathcal{S} \to \mathbb{R}^{p_2}$ & Interaction feature mapping & Maps context to interaction features, which are multiplied by $\mathcal{A}$ \\
+$\Theta$ & Linear model coefficients & From regression $\mathcal{R} \sim [f_1(\mathcal{S}) + f_2(\mathcal{A} \cdot \mathcal{S})]\Theta$ \\
+$\varepsilon$ & Linear model residuals & Residuals from HSv1 data after regression \\
+$N$ & Number of users  & $N =48$ in HSv1; $N$ varies for simulations  \\
+$T$ & Number of days in study  & $T = 41$ in HSv1; $T = 90$ in HSv2  \\
+$D$ & Number of decision points per day &  Set to $D = 5$ \\
+$K$ & Number of cross-validations per test & Currently $K = 5$ 
+\\
+$B$ & Number of batches per simulation  & Ideally $B = 1000$, worst case $B = 100$\\ \bottomrule
+\end{tabular*}
+  \end{table}
+
+
+
+\section{Reward Generative Model}
+
+We set different generative models, where we assume:
+\begin{equation}
+\mathcal{R} = \begin{bmatrix}f_1(\mathcal{S}), &
+\mathcal{A} \odot f_2(\mathcal{S})
+\end{bmatrix}^T \Theta + \varepsilon
+\end{equation}
+
+and that $f_1, f_2$ are linear, and $\varepsilon \sim \mathcal{N}\left(0, \sigma^2 \right)$ for $\sigma^2$, which is a tuning parameter.  Recall that the Signal-to-Noise-Ratio (SNR) is computed as 
+\begin{equation}
+\label{SNR equation}
+	\frac{\Var\left(\begin{bmatrix}
+f_1(\mathcal{S}), & A \odot f_2(\mathcal{S})	
+\end{bmatrix}\Theta\right)}{\sigma^2}.
+\end{equation}
+
+We describe these models more in Section \ref{Models/Reward Generative Models}.
+
+
+
+
+
+\section{Cross-Validation}
+
+We use $K = 5$ fold cross-validation to separate training and test batches.  We do not train the bandit algorithm's parameters on the test batches, as to simulate  application of HSv1 data for HSv2.  
+
+To do this, we randomly order the $N = 48$ users, then group the randomly ordered users into $K$ groups; the $K$-th fold cross-validation is performed holding the $K$-th group out as the test sample, and the remaining groups in as the training sample.
+
+For each user, we have a series across all days $T$ and decision points $t$ per day of Reward, Action, and Context.  We will refer to them as $(\mathcal{R}, \mathcal{A}, \mathcal{S})_{(N,T,t)}$, which are implicitly indexed in order by the user, day, and decision point.  Thus, there are $N \times T \times t$ data points.
+
+
+
+\section{Residual Formation}
+
+Within each test batch and training batch, we can conduct ordinary least squares linear regression to residualize additional effects for each user from the contextual and interaction effects.  Specifically, we use the model in Equation \ref{Context Residualization Equation}:
+
+\begin{equation}
+\label{Context Residualization Equation}
+\mathcal{R} \sim
+\begin{bmatrix}
+f_1(\mathcal{S}), &
+\mathcal{A} \odot f_2(\mathcal{S})
+\end{bmatrix}^T \Theta + \varepsilon
+\end{equation}
+
+where $\odot$ denotes element-wise multiplication; i.e., for each user $n \le N$, day $t \le T$, and decision point $d \le D$, we multiply the $p_2$-dimensional interaction component by the action of that day.   Recall that $f_1$, $f_2$ are the baseline and interaction functions that are parameters of the generative model.
+
+We obtain $\hat{\Theta}$ as well as a series of $\varepsilon$ for each data point.
+
+
+
+\section{Simulated User Generation}
+
+For both the training and test original users' series of $(\mathcal{R}, \mathcal{A}, \mathcal{S})$, we can create $N_{sim}$ users with duration $T_{sim}$ data, keeping $t$ decision points per day.
+
+To create each of the $N_{sim}$ simulated users, we randomly sample an existing user from HSv1, concatenate all available days of the sampled existing user to the simulated user, and sample until the simulated user has $N_{sim}$ days of data points. 
+
+This is reproduced in Algorithm \ref{Simulated User Algorithm}, where we feed in either a training or testing batch of users $(\mathcal{S}, \varepsilon)_{N,T,D}^{batch}$.
+
+
+We note finally that there are no missing data points in each of the $N_{sim}$ users, and that for testing, we set availability to True always.
+
+
+\begin{algorithm}[H]
+\label{Simulated User Algorithm}
+ \KwData{$(\mathcal{S},\varepsilon)_{N,T,D}^{batch}$}
+ \KwResult{$(\mathcal{S},\varepsilon)_{N,T,D}^{sim}$}
+ \For{$1 \le n \le N_{new}$}{
+ \While{$(\mathcal{S},\varepsilon)_{n,:,:}^{batch}$ does not have $N_{sim}$ data points} {
+  	Sample a single user $n' \in [1,N_{batch}]$ without replacement\;
+  	Append $(S,\epsilon)_{n',:,:}^{batch}$ to $(S, \epsilon)_{n,:,:}^{sim}$\;
+  }
+ }
+ \caption{Simulated User Generation Pseudocode}
+\end{algorithm}
+
+
+\section{Training Bandit Algorithm Tuning Parameters}
+
+
+We will try to set $N_{sim} = 1000$ for the number of training users, as to average across the data.  If there is computational difficulty, we will use $N_{sim} = 100$ for the training.
+
+For each variant of the Bandit Algorithm, we will tune parameters differently.  These will be addressed in Section \ref{Models/Bandit Algorithm Variants}.
+
+Ultimately, the models will be tuned according to minimizing the mean regret across all users and across the entire $T_{sim}$ day simulation.
+
+{\color{red} Should we minimize based on a different metric?  A weighted average of standard deviation across users of mean regret per user too?}
+
+
+\section{Simulated User Testing and Quality Metrics}
+
+Once the initialization parameters have been trained for the batch, we run $B$ batches of the testing simulated users, and analyze the quality metrics described below:
+
+\begin{enumerate}
+	\item Examine time series of $\pi_t(1 | S_t)$, the probability of taking action $1$ for all $t$, looking through several users.
+	\item Examine $\pi_t(1 | S_t)$ vs $opt_t(S_t)$ for all $t$, looking through several users.
+	\subitem We define $opt_t(S_t)$ as the optimal probability in context $S_t$:
+	\begin{equation}
+	\label{opt equation}
+		opt_t(S_t) = 0.8\ \mathbb{1}\{\text{optimal action is $1$ in $S_t$}\} + 0.2\ \mathbb{1}\{\text{optimal action is $0$ in $S_t$}\} .
+	\end{equation}
+	\item Examine $|\pi_t(1 | S_t) - opt_t(S_t)|$ for all users, averaging over all $N$ users for each time point $t$.
+	\item Examine $|\pi_t(1 | S_t) - opt_t(S_t)|$ for all users, plotting histogram of each user's mean
+	\item Examine cumulative regret over $t$, plotting average over all users as well as for several individual users. 
+	\subitem Cumulative regret is the expected reward of the bandit minus reward of the optimal policy.
+	\item Examine the number of actions taken at each time $t$, plotting histogram across all $t$ for each of several simulated users, as well as the average taken across all $N$ users plotted at each time $t$.
+\end{enumerate}

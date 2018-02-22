@@ -1,0 +1,17 @@
+\contentsline {chapter}{\numberline {1}Questions}{3}{chapter.1}
+\contentsline {chapter}{\numberline {2}Data}{5}{chapter.2}
+\contentsline {chapter}{\numberline {3}Methods}{6}{chapter.3}
+\contentsline {section}{\numberline {3.1}Reward Generative Model}{7}{section.3.1}
+\contentsline {section}{\numberline {3.2}Cross-Validation}{9}{section.3.2}
+\contentsline {section}{\numberline {3.3}Residual Formation}{9}{section.3.3}
+\contentsline {section}{\numberline {3.4}Simulated User Generation}{10}{section.3.4}
+\contentsline {section}{\numberline {3.5}Training Bandit Algorithm Tuning Parameters}{11}{section.3.5}
+\contentsline {section}{\numberline {3.6}Simulated User Testing and Quality Metrics}{12}{section.3.6}
+\contentsline {chapter}{\numberline {4}Models}{13}{chapter.4}
+\contentsline {section}{\numberline {4.1}Reward Generative Models}{14}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Basic Linear Generative Model}{14}{subsection.4.1.1}
+\contentsline {subsection}{\numberline {4.1.2}Additional Models}{14}{subsection.4.1.2}
+\contentsline {section}{\numberline {4.2}Bandit Algorithm Variants}{14}{section.4.2}
+\contentsline {chapter}{\numberline {5}Results}{17}{chapter.5}
+\contentsline {chapter}{\numberline {6}Discussion}{19}{chapter.6}
+\contentsline {chapter}{\numberline {7}Conclusion}{21}{chapter.7}
