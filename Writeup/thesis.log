@@ -1,7 +1,7 @@
-This is XeTeX, Version 3.14159265-2.6-0.99998 (MiKTeX 2.9.6500 64-bit) (preloaded format=xelatex 2018.2.7)  16 FEB 2018 15:42
+This is XeTeX, Version 3.14159265-2.6-0.99998 (MiKTeX 2.9.6500 64-bit) (preloaded format=xelatex 2018.2.7)  5 MAR 2018 15:23
 entering extended mode
-**"C:/Users/isaac/Dropbox/Harvard 17-18 Senior/Thesis/Writeup/thesis.tex"
-("C:/Users/isaac/Dropbox/Harvard 17-18 Senior/Thesis/Writeup/thesis.tex"
+**./thesis.tex
+(thesis.tex
 LaTeX2e <2017-04-15>
 Babel <3.15> and hyphenation patterns for 75 language(s) loaded.
 (Dissertate.cls
@@ -1373,17 +1373,17 @@ Chapter 1.
 
 ]
 LaTeX Font Info:    Font shape `TU/SourceCodePro(0)/m/n' will be
-(Font)              scaled to size 10.04187pt on input line 16.
+(Font)              scaled to size 10.04187pt on input line 19.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `SourceCodePro' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `TU/EBGaramond(2)/m/n' will be
-(Font)              scaled to size 8.0pt on input line 16.
+(Font)              scaled to size 8.0pt on input line 19.
 LaTeX Font Info:    Font shape `TU/EBGaramond(2)/m/n' will be
-(Font)              scaled to size 6.0pt on input line 16.
+(Font)              scaled to size 6.0pt on input line 19.
 LaTeX Font Info:    Font shape `TU/SourceCodePro(0)/m/it' will be
-(Font)              scaled to size 9.99994pt on input line 17.
+(Font)              scaled to size 9.99994pt on input line 19.
 ) [4]
 \openout2 = `chapters/data.aux'.
 
@@ -1411,126 +1411,132 @@ Chapter 3.
 
 
 
-]
+] [7]
 LaTeX Font Info:    Font shape `TU/LatoRegular(0)/bx/n' will be
-(Font)              scaled to size 9.35669pt on input line 25.
+(Font)              scaled to size 9.35669pt on input line 47.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `LatoRegular' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `TU/LatoRegular(0)/bx/n' will be
-(Font)              scaled to size 7.79724pt on input line 25.
+(Font)              scaled to size 7.79724pt on input line 47.
 LaTeX Font Info:    Font shape `TU/LatoRegular(0)/m/n' will be
-(Font)              scaled to size 9.4768pt on input line 25.
+(Font)              scaled to size 9.4768pt on input line 47.
 LaTeX Font Info:    Font shape `TU/LatoRegular(0)/m/n' will be
-(Font)              scaled to size 7.89734pt on input line 25.
+(Font)              scaled to size 7.89734pt on input line 47.
 
-Underfull \hbox (badness 10000) in paragraph at lines 34--34
+Underfull \hbox (badness 10000) in paragraph at lines 56--56
 []\TU/EBGaramond(2)/bx/n/12 Baseline features
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 35--35
+Underfull \hbox (badness 10000) in paragraph at lines 56--57
+[]\TU/EBGaramond(2)/bx/n/12 Full set consists of 7 features with 1 bias term,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 57--57
 []\TU/EBGaramond(2)/bx/n/12 Interaction features
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 36--37
-[]\TU/EBGaramond(2)/bx/n/12 Binary – active message sent, no active mes-
+Underfull \hbox (badness 10000) in paragraph at lines 57--58
+[]\TU/EBGaramond(2)/bx/n/12 Full set consists of 3 features with 1 bias term,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 37--38
-[]\TU/EBGaramond(2)/bx/n/12 Step count in $[][]$ minutes following decision
+Underfull \hbox (badness 10000) in paragraph at lines 58--59
+[]\TU/EBGaramond(2)/bx/n/12 Binary – $[]$: active message sent, $[]$: no active
+
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 38--38
+Underfull \hbox (badness 10000) in paragraph at lines 59--60
+[]\TU/EBGaramond(2)/bx/n/12 Log-transformed step count in $[][]$ minutes
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 60--60
 []\TU/EBGaramond(2)/bx/n/12 Baseline feature
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 39--39
+Underfull \hbox (badness 10000) in paragraph at lines 61--61
 []\TU/EBGaramond(2)/bx/n/12 Interaction feature
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 39--40
+Underfull \hbox (badness 10000) in paragraph at lines 61--62
 []\TU/EBGaramond(2)/bx/n/12 Maps context to interaction features, which
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 40--40
-[]\TU/EBGaramond(2)/bx/n/12 Linear model coeffi-
+Underfull \hbox (badness 10000) in paragraph at lines 62--62
+[]\TU/EBGaramond(2)/bx/n/12 ‘True’ generative
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 43--43
+Underfull \hbox (badness 10000) in paragraph at lines 65--65
 []\TU/EBGaramond(2)/bx/n/12 Number of days in
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 44--44
+Underfull \hbox (badness 10000) in paragraph at lines 66--66
 []\TU/EBGaramond(2)/bx/n/12 Number of decision
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 45--45
+Underfull \hbox (badness 10000) in paragraph at lines 67--67
 []\TU/EBGaramond(2)/bx/n/12 Number of cross-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 47--47
-[]\TU/EBGaramond(2)/bx/n/12 Number of batches
- []
-
-
-Underfull \hbox (badness 10000) in alignment at lines 29--48
+Underfull \hbox (badness 10000) in alignment at lines 51--69
 [][][]
  []
 
-[7] [8] [9]
+[8] [9] [10] [11] [12]
 LaTeX Font Info:    Font shape `TU/EBGaramond(2)/bx/n' will be
-(Font)              scaled to size 8.0pt on input line 127.
+(Font)              scaled to size 8.0pt on input line 167.
 LaTeX Font Info:    Font shape `TU/EBGaramond(2)/m/it' will be
-(Font)              scaled to size 12.0pt on input line 127.
- [10] [11]) [12]
+(Font)              scaled to size 12.0pt on input line 167.
+) [13]
 \openout2 = `chapters/models.aux'.
 
  (chapters/models.tex
 Chapter 4.
-[13
+[14
 
 
 
-] [14]) [15] [16]
+] [15]) [16] [17]
 \openout2 = `chapters/results.aux'.
 
  (chapters/results.tex
 Chapter 5.
-) [17
+) [18
 
 
 
-] [18]
+] [19]
 \openout2 = `chapters/discussion.aux'.
 
  (chapters/discussion.tex
 Chapter 6.
-) [19
+) [20
 
 
 
-] [20]
+] [21]
 \openout2 = `chapters/conclusion.aux'.
 
  (chapters/conclusion.tex
 Chapter 7.
-) [21
+) [22
 
 
 
-] [22]
+] [23]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 47.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 47.
  (thesis.aux (chapters/questions.aux) (chapters/data.aux)
@@ -1544,12 +1550,12 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 25782 strings out of 427839
- 469189 string characters out of 3152539
- 629125 words of memory out of 3000000
- 29413 multiletter control sequences out of 15000+200000
+ 25783 strings out of 427839
+ 469020 string characters out of 3152539
+ 630304 words of memory out of 3000000
+ 29415 multiletter control sequences out of 15000+200000
  537970 words of font info for 92 fonts, out of 3000000 for 9000
  1328 hyphenation exceptions out of 8191
- 60i,17n,118p,10572b,486s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 60i,17n,118p,10513b,492s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on thesis.pdf (22 pages).
+Output written on thesis.pdf (23 pages).

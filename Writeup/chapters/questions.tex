@@ -12,9 +12,17 @@
 We choose to answer the following questions (see Table \ref{Notation Table} for notation):
 
 \begin{enumerate}
-	\item How robust is the bandit algorithm to misspecification of linear model for the true generative model given context?  How does this vary with signal to noise ratio (Equation \ref{SNR equation})?
+	\item Consider multiple simulated users, all with the same state distribution and the same reward distribution.  How does the achieved reward vary by user?  How much variance is there from user to user?
+		\subitem Can compare this mean/variance to the mean/variance in reward across users if treatment is randomized with probability $0.6$.
+
+
+	\item If there is no treatment effect (i.e. the generative model in the simulation for the reward does not depend on action $\mathcal{A}$, or that the true value of interaction terms of $\Theta$ are $0$), then what does the selection probabilities do?  Does the choice of the prior mean, $\mu_\Theta$ affect this?  For example, for the interaction terms, if $\mu_\Theta$ is not close to $0$ but in reality true $\Theta = 0$.
+	
 	\item How fast does the bandit algorithm result in action selection probabilities equal to $0.2$ or $0.8$?  How does this vary with SNR?  How does this vary with the diagonal variance terms in $\Sigma_\Theta$, the prior on $\Theta$?
-	\item If there is no treatment effect (i.e. the generative model in the simulation for the reward does not depend on action $\mathcal{A}$, or that the true value of interaction terms of $\Theta$ are $0$), then what doe the selection probabilities do?  Does the choice of the prior mean, $\mu_\Theta$ affect this?  For example, for the interaction terms, if $\mu_\Theta$ is not close to $0$ but in reality true $\Theta = 0$.
+
+	\item How robust is the bandit algorithm to misspecification of linear model for the true generative model given context?  How does this vary with signal to noise ratio (Equation \ref{SNR equation})?
+
+
 	\item How sensitive is the bandit algorithm to really good initialization of the $\Theta$ coefficients in the linear model?  that is, when the prior on $\Theta$ has a mean $\mu_\Theta$ that is close or equal to the true values of $\Theta$ in the true reward generative model.  How sensitive is the bandit algorithm to really poor initialization of the coefficients in the linear model?
 	\item If the true underlying model for the conditional mean of the reward given context varies with time $t$ in a way that leads to differing optimal actions from some commonly occurring contexts, then does the bandit algorithm adjust to this?
 \end{enumerate}
