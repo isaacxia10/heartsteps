@@ -1,13 +1,11 @@
 import numpy as np
-# import seaborn as sns
-# import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
 from scipy.stats import norm
 
 
 #################
-# Test Bed 2-25 #
+# Test Bed 5/4 #
 #################
 # HS Analysis Functions
 
@@ -259,7 +257,6 @@ def resid_regression(N, T, t, nBaseline, nInteract, f_baseline, f_interact, rewa
     A = actionVec.copy()
     S = featVec.copy()
 
-
     # Fit OLS r ~ (a_t s'_t, s_t)^T \eta, where s' are interact terms and s are all baseline
     
     exog = np.concatenate([(A * f_interact(S)), f_baseline(S)], 2).reshape((N*T*t,(nInteract + nBaseline)))
@@ -285,6 +282,43 @@ def resid_regression(N, T, t, nBaseline, nInteract, f_baseline, f_interact, rewa
         resids[n][:curr_ind-old_ind] = resids_unproc[old_ind:curr_ind]
     
     return resids, Thetas_fit, resid_model
+
+
+def resid_regression_test(N, T, t, nBaseline, nInteract, f_baseline, f_interact, rewardVec, actionVec, featVec, Thetas_fit_train):
+    '''Perform Regression on Pooled R ~ A*S' + S to create Residuals in test batch, using Thetas_fit'''
+    # Actual Dimensions of A and S
+    a_dim = 1
+    s_dim = nBaseline
+
+    # Copy for notational ease
+    R = rewardVec.copy()
+    A = actionVec.copy()
+    S = featVec.copy()
+
+    # Fit OLS r ~ (a_t s'_t, s_t)^T \eta, where s' are interact terms and s are all baseline
+    
+    exog = np.concatenate([(A * f_interact(S)), f_baseline(S)], 2).reshape((N*T*t,(nInteract + nBaseline)))
+    resid_model = sm.OLS(endog = R.reshape(N*T*t), exog = exog, missing = "drop")
+    resids_unproc = R.reshape(N*T*t) - exog.dot(Thetas_fit_train)
+
+    # Parameters
+    Thetas_fit = resid_model.fit().params
+
+    ## Fill resids ##
+
+    # Copy shape and location of nans
+    resids = rewardVec.copy()
+
+    curr_ind = 0
+    for n in range(N):
+
+        old_ind = curr_ind
+        curr_ind += R[n][~np.isnan(R[n])].shape[0]
+
+        # Copy in indices
+        resids[n][:curr_ind-old_ind] = resids_unproc[old_ind:curr_ind]
+    
+    return resids
 
 
 # # Code to Generate Simulated Users USE IF WANT CUSTOM LENGTH TIME
@@ -387,29 +421,56 @@ def sample_sim_users(resids, A, S, N_new, T, t, seed = None):
     return resids_new, A_new, S_new
 
 
-#Create a reward function from true coefficients, with residuals non-mandatory
-def reward_func_identity(S, A, coef0, coef1, resid = None, single_dim = True):
-    '''Basic reward function, can edit for different generative models.
-    Identity on baseline and interaction terms.
-    Works for multidimensional eta, a, and s, so long as they are of same multidimension.
-    Assumes s has first element as bias for the regression.
+
+
+# #Create a reward function from true coefficients, with residuals non-mandatory
+# def reward_func_identity(S, A, coef0, coef1, resid = None, single_dim = True):
+#     '''Basic reward function, can edit for different generative models.
+#     Identity on baseline and interaction terms.
+#     Works for multidimensional eta, a, and s, so long as they are of same multidimension.
+#     Assumes s has first element as bias for the regression.
     
-    Resid must be passed in if not single dim.
-    If single dim, can speed out without np.take.'''
+#     Resid must be passed in if not single dim.
+#     If single dim, can speed out without np.take.'''
     
-    nInteract = len(coef1)
+#     nInteract = len(coef1)
     
-    if single_dim:
-        predictors = np.concatenate([A * S[1:1+nInteract], S], 0)
-    else:
-        predictors = np.concatenate([A * np.take(S,range(1,1+nInteract),-1), S], 0)
+#     if single_dim:
+#         predictors = np.concatenate([A * S[1:1+nInteract], S], 0)
+#     else:
+#         predictors = np.concatenate([A * np.take(S,range(1,1+nInteract),-1), S], 0)
     
-    Theta = np.concatenate([coef1, coef0])
+#     Theta = np.concatenate([coef1, coef0])
     
-    if resid is None:
-        resid = 0
+#     if resid is None:
+#         resid = 0
         
-    return(resid + np.dot(predictors, Theta))
+#     return(resid + np.dot(predictors, Theta))
+
+
+# #Create a reward function from true coefficients, with residuals non-mandatory
+# def reward_func_small(S, A, coef0, coef1, resid = None, single_dim = True):
+#     '''Basic reward function, can edit for different generative models.
+#     Identity on baseline and interaction terms.
+#     Works for multidimensional eta, a, and s, so long as they are of same multidimension.
+#     Assumes s has first element as bias for the regression.
+    
+#     Resid must be passed in if not single dim.
+#     If single dim, can speed out without np.take.'''
+    
+#     nInteract = len(coef1)
+    
+#     if single_dim:
+#         predictors = np.concatenate([A * S[1:1+nInteract], S], 0)
+#     else:
+#         predictors = np.concatenate([A * np.take(S,range(1,1+nInteract),-1), S], 0)
+    
+#     Theta = np.concatenate([coef1, coef0])
+    
+#     if resid is None:
+#         resid = 0
+        
+#     return(resid + np.dot(predictors, Theta))
 
 
 
@@ -423,7 +484,7 @@ def reward_func_general(S, A, coef0, coef1, f_baseline, f_interact, resid = None
     If single dim, can speed out without np.take.'''
     
     
-    predictors = np.concatenate([A * f_interact(S), f_baseline(S)], 0)
+    predictors = np.concatenate([A * f_interact(S), f_baseline(S)], -1)
     
     Theta = np.concatenate([coef1, coef0])
     
@@ -463,17 +524,6 @@ def k_fold_split(S, R, A, k = 5, seed = None):
     return train_zip, test_zip
 
 
-
-#A bandit model, consisting of reward coefficient mean and covariance
-
-# From Peng's 2-1 algorithm; action-centered bandit (algorithm 2)
-
-
-class model:
-    def __init__(self,mu,Sigma):
-        self.mu = mu
-        self.Sigma = Sigma
-        
 ########################################################################################
 #THE BANDIT CODE (in class form)
 ##### A bandit model, consisting of reward coefficient mean and covariance
@@ -491,7 +541,7 @@ class model:
 
 class ContextBandit:
     #Bandit Object
-    def __init__(self, nInteract, pc_params,prior_model, gamma, fc_params, f_baseline, f_interact, sigma2 = 1., prior_weight = 1.):
+    def __init__(self, nInteract, prior_model, gamma, f_baseline, f_interact, fc_params = None, pc_params = None, sigma2 = 1., prior_weight = 1., fc_flag = True, pc_flag = True, ac_flag = True):
         '''
         pc_params: (pi_min, pi_max) parameters for probability clipping
         prior_model: prior Gaussian model with \mu_\beta, \Sigma_\beta
@@ -502,23 +552,33 @@ class ContextBandit:
         f_interact: interaction feature mapping; f_interact: S' \to R^p_2
         sigma2: reward noise estimate (variance)
         prior_weight: how much to weigh prior, set to 1 for full weight
+
+        fc_flag, pc_flag, ac_flag: Whether bandit should include feedback controller, probability clipping, or action centering; True is include, False is not include
         '''
         
         #initialize input parameters
+
+
+        self.fc_flag = fc_flag
+        self.pc_flag = pc_flag
+        self.ac_flag = ac_flag
+
+
         self.nInteract = nInteract
-        self.pi_min = pc_params[0]
-        self.pi_max = pc_params[1]
+        if pc_flag:
+            self.pi_min = pc_params[0]
+            self.pi_max = pc_params[1]
         self.gamma = gamma
         self.sigma2 = sigma2
 
         self.f_baseline = f_baseline
         self.f_interact = f_interact
 
-        self.lambda_c = fc_params[0]
-        self.N_c = fc_params[1]
-        self.T_c = fc_params[2]
+        if fc_flag:
+            self.lambda_c = fc_params[0]
+            self.N_c = fc_params[1]
+            self.T_c = int(fc_params[2])
 
-        # self.v = 1e-1 #tuning parameter - multiplier on bandit prior covariances 
 
         
         #Initialize model to prior data model
@@ -534,7 +594,7 @@ class ContextBandit:
         self.daystart_model = model(prior_weight*prior_model.mu,
             (1-prior_weight)*np.eye(len(prior_model.mu)) + prior_weight*prior_model.Sigma)
         
-    def process_context(self, I_T, S_T, N_t):
+    def process_context(self, I_T, S_T, N_t = None):
         '''
         Inputs context for a given decision point,
         updates the current day's model, and returns action probability alpha
@@ -553,20 +613,24 @@ class ContextBandit:
             Sigma2 = current_model.Sigma[:self.nInteract,:self.nInteract]
 
             # Compute probability of unclipped randomization probability
-            X_mean = self.f_interact(S_T).T.dot(mu2) - self.lambda_c*(N_t - self.N_c)*(N_t - self.N_c > 0)
+            X_mean = self.f_interact(S_T).T.dot(mu2)
+
+            if self.fc_flag: # If using feedback controller, subtract fc term
+                X_mean = self.f_interact(S_T).T.dot(mu2) - self.lambda_c*(N_t - self.N_c)*(N_t - self.N_c > 0)
             X_var = self.f_interact(S_T).dot(Sigma2.dot(self.f_interact(S_T).T))
 
             # Actual probability
             pi_t = 1 - norm.cdf(0, X_mean, np.sqrt(X_var))
 
-            if pi_t < self.pi_min:
-                alpha = self.pi_min
-            elif pi_t > self.pi_max:
-                alpha = self.pi_max
-            else: 
-                alpha = pi_t
-            # print(mean, variance, alpha)
+            alpha = pi_t
 
+            if self.pc_flag:
+                if pi_t < self.pi_min:
+                    alpha = self.pi_min
+                elif pi_t > self.pi_max:
+                    alpha = self.pi_max
+
+        
         else:
             alpha = 0
 
@@ -579,7 +643,7 @@ class ContextBandit:
         
     ######
     
-    def update_model_daily(self, S_T, R_T, A_T, pi_T, I_T, t = 5, action_centering = True):
+    def update_model_daily(self, S_T, R_T, A_T, pi_T, I_T, t = 5):
         # Update at end of day
         '''
         At end of day, updates the 
@@ -589,7 +653,6 @@ class ContextBandit:
         pi_T: probabilities of action 1 for day T
         I_T: availability for each time point on day T
         t: number of decision points per day, defaults to 5
-        action_centering: flag for centering action (subtracts pi_T from action)
         '''
 
         # Set aliases for the current model
@@ -600,7 +663,7 @@ class ContextBandit:
         for dpt in range(t):
             # If available then:
             if I_T[dpt]:
-                if action_centering:
+                if self.ac_flag:
                     f_t = np.concatenate([(A_T[dpt] - pi_T[dpt]) * self.f_interact(S_T[dpt]), self.f_baseline(S_T[dpt])], axis=0)
                 else:
                     f_t = np.concatenate([(A_T[dpt]) * self.f_interact(S_T[dpt]), self.f_baseline(S_T[dpt])], axis=0)
@@ -625,9 +688,10 @@ class ContextBandit:
 #A simulation of above standard model.
 
 
-def run_simulation(coef0, coef1, S_sim, I_sim, resids_sim, reward_func, prior_model,f_baseline, f_interact,
-                   fc_params, nInteract = 3+1, nBaseline = 7+1, pc_params = [.1, .8],
-                   gamma = 1., sigma2 = 1. , T = 42, t = 5, no_resid_flag = False, seed = None):
+def run_simulation(coef0, coef1, S_sim, I_sim, resids_sim, reward_func, prior_model, f_baseline, f_interact, f_baseline_identity, f_interact_identity,
+                   fc_params = None, nInteract = 3+1, nBaseline = 7+1, pc_params = [.1, .8],
+                   gamma = 1., sigma2 = 1. , T = 42, t = 5, no_resid_flag = False,
+                   seed = None, fc_flag = True, pc_flag = True, ac_flag = True, Thetas_fit_bandit = None):
     '''
     coef0: Reward coefficients for baseline, first element is bias term
     coef1: Reward coefficients for interaction, first element is bias term; note that concatenated, [coef1, coef0] = Theta
@@ -642,38 +706,41 @@ def run_simulation(coef0, coef1, S_sim, I_sim, resids_sim, reward_func, prior_mo
     T: days of study
     t: decision points per day
     no_resid_flag: If True will substitute 0 for residuals, if False will use true residuals
+
+    fc_flag, pc_flag, ac_flag: Whether bandit should include feedback controller, probability clipping, or action centering; True is include, False is not include
     '''
     N = S_sim.shape[0]
     assert T == S_sim.shape[1]
     assert t == S_sim.shape[2]
-    assert nBaseline == S_sim.shape[3]
     
     #creating variables for saving history of what we do
-    reward_exp = np.empty((N, T, t)) # Bandit reward
-    reward_0 = np.empty((N, T, t)) # Reward of action 0
-    reward_1 = np.empty((N, T, t)) # Reward of action 1
+    # reward_exp = np.empty((N, T, t)) # Bandit reward
+    regret = np.empty((N, T, t))
     prob  = np.empty((N, T, t))
     action = np.empty((N, T, t))
+    opt = np.empty((N, T, t))
     fc_invoked = np.empty((N, T, t))
-    reward_exp.fill(np.nan)
-    reward_0.fill(np.nan)
-    reward_1.fill(np.nan)
+    treatment_pred = np.empty((N, T, t))
+    regret.fill(np.nan)
     prob.fill(np.nan)
     action.fill(np.nan)
+    opt.fill(np.nan)
     fc_invoked.fill(np.nan)
+    treatment_pred.fill(np.nan)
     
     seed_rand = np.random.RandomState(seed)
     
     # Containers for bandit parameters
     #bandit_covs = np.empty((N, T,t, nInteract+nBaseline, nInteract+nBaseline))
     #bandit_covs.fill(np.nan)
-    bandit_means = np.empty((N, T,t, nInteract+nBaseline))
-    bandit_means.fill(np.nan)
+    theta_mse = np.empty((N, T,t))
+    theta_mse.fill(np.nan)
 
     for sim_user_index in range(N):
 
         # Create and initialize bandit object for each user
-        bandit = ContextBandit(nInteract, pc_params, prior_model, gamma, fc_params, f_baseline, f_interact, sigma2)
+        bandit = ContextBandit(nInteract = nInteract, prior_model = prior_model, gamma = gamma, f_baseline = f_baseline, f_interact = f_interact, sigma2 = sigma2, pc_params = pc_params, fc_params = fc_params, fc_flag = fc_flag, pc_flag = pc_flag, ac_flag = ac_flag)
+
 
         #Cycle through days where not all values are nan
         T_max = np.where(np.isnan(resids_sim[sim_user_index].sum(axis=1)))[0][0]
@@ -692,14 +759,18 @@ def run_simulation(coef0, coef1, S_sim, I_sim, resids_sim, reward_func, prior_mo
                 # featInteract = S_sim[sim_user_index, day, dpt, 1:1+nInteract] #only use the interaction features, but first element is bias
                 if False: #Do nothing
                     prob[sim_user_index, day, dpt] = 0
-                else: #Use bandit
-                    # Count dosage from previous N_c days
-                    N_t = np.sum(action[sim_user_index].reshape(-1)[max(0,-bandit.T_c + dpt):dpt])
-                    # Compute clipped probability
-                    prob[sim_user_index, day, dpt] = bandit.process_context(
-                    I_sim[sim_user_index, day, dpt], S_sim[sim_user_index, day, dpt], N_t)
-                    # Save whether feedback controller was used
-                    fc_invoked[sim_user_index, day, dpt] = (N_t > bandit.N_c)
+                else: #Use bandit; invoke feedback controller if flag is on
+                    if fc_flag:
+                        # Count dosage from previous T_c decision points
+                        N_t = np.sum(action[sim_user_index].reshape(-1)[max(0,-bandit.T_c + day*t + dpt):day*t + dpt])
+                        # Compute clipped probability
+                        prob[sim_user_index, day, dpt] = bandit.process_context(
+                        I_sim[sim_user_index, day, dpt], S_sim[sim_user_index, day, dpt], N_t)
+                        # Save whether feedback controller was used
+                        fc_invoked[sim_user_index, day, dpt] = (N_t > bandit.N_c)
+                    else:
+                        prob[sim_user_index, day, dpt] = bandit.process_context(
+                        I_sim[sim_user_index, day, dpt], S_sim[sim_user_index, day, dpt])
 
 
                 #Choose action based on probability, i.e. do the randomization
@@ -708,24 +779,31 @@ def run_simulation(coef0, coef1, S_sim, I_sim, resids_sim, reward_func, prior_mo
                 else:
                     action[sim_user_index, day, dpt] = 0
 
+                treatment_pred[sim_user_index, day, dpt] = np.dot(f_interact_identity(S_sim[sim_user_index, day, dpt]), coef1)
+                # print("(" + str(sim_user_index) + ",", str(day) +  "," +  str(dpt) + "); f: ", f_interact_identity(S_sim[sim_user_index, day, dpt]), coef1, np.dot(f_interact_identity(S_sim[sim_user_index, day, dpt]), coef1))
+
                 #Receive reward from the universe. 
-                rwd[dpt] = reward_func(S_sim[sim_user_index, day, dpt], action[sim_user_index, day, dpt], coef0, coef1, user_resid)
+                rwd[dpt] = reward_func(S_sim[sim_user_index, day, dpt], action[sim_user_index, day, dpt], coef0, coef1, f_baseline_identity, f_interact_identity, user_resid)
 
                 #What was expected regret given probability chosen by bandit?
                 #(easy to do since we know the \theta coefficients, reward under action 1 is reward under action 0 plus \theta^T s_t, and vice versa)
-                reward_0[sim_user_index, day, dpt] = reward_func(S_sim[sim_user_index, day, dpt], 0, coef0, coef1, user_resid) # do we want to include user_resid here or use default 0?
-                reward_1[sim_user_index, day, dpt] = reward_func(S_sim[sim_user_index, day, dpt], 1, coef0, coef1, user_resid)
+                rwd0 = reward_func(S_sim[sim_user_index, day, dpt], 0, coef0, coef1, f_baseline_identity, f_interact_identity, user_resid)
+                rwd1 = reward_func(S_sim[sim_user_index, day, dpt], 1, coef0, coef1, f_baseline_identity, f_interact_identity, user_resid)
 
                 #Expected reward under bandit policy
-                reward_exp[sim_user_index, day, dpt] = prob[sim_user_index, day, dpt]*reward_1[sim_user_index, day, dpt] + (1-prob[sim_user_index, day, dpt])*reward_0[sim_user_index, day, dpt]
+                rwdExp = prob[sim_user_index, day, dpt]*rwd1 + (1-prob[sim_user_index, day, dpt])*rwd0
+
+                #Regret is difference between optimal reward and the reward we got
+                regret[sim_user_index, day, dpt] = max(pc_params[0]*rwd1 + (1-pc_params[0])*rwd0, pc_params[1]*rwd1 + (1-pc_params[1])*rwd0) - rwdExp
+
+                opt[sim_user_index, day, dpt] = pc_params[1] * (rwd1 > rwd0) + pc_params[0] * (rwd1 <= rwd0)
 
             #Perform bandit updates at end of day
             for dpt in range(t):
                 #bandit_covs[sim_user_index, day, dpt] = bandit.daystart_model.Sigma
-                #print(bandit_means[sim_user_index, day, dpt].shape, bandit.daystart_model.mu.flatten().shape)
-                bandit_means[sim_user_index, day, dpt] = bandit.daystart_model.mu.flatten()
+                theta_mse[sim_user_index, day, dpt] = ((Thetas_fit_bandit - bandit.daystart_model.mu) ** 2).mean()
                 bandit.update_model_daily(S_sim[sim_user_index, day], rwd, action[sim_user_index, day], prob[sim_user_index, day], I_sim[sim_user_index, day])
 
     #return reward_exp.reshape((N,T*t)), reward_0.reshape((N,T*t)), reward_1.reshape((N,T*t)), prob.reshape((N,T*t)), action.reshape((N,T*t)), fc_invoked.reshape((N, T*t)), bandit_covs.reshape((N,T*t, nInteract+nBaseline,nInteract+nBaseline)), bandit_means.reshape((N,T*t, nInteract+nBaseline)), bandit
-    return reward_exp.reshape((N,T*t)), reward_0.reshape((N,T*t)), reward_1.reshape((N,T*t)), prob.reshape((N,T*t)), action.reshape((N,T*t)), fc_invoked.reshape((N, T*t)), bandit_means.reshape((N,T*t, nInteract+nBaseline)), bandit
+    return regret.reshape((N,T*t)), prob.reshape((N,T*t)), action.reshape((N,T*t)), opt.reshape((N, T*t)), fc_invoked.reshape((N, T*t)), theta_mse.reshape((N,T*t)), treatment_pred.reshape((N,T*t)), bandit
 

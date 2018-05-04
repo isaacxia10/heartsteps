@@ -27,16 +27,16 @@
     \ClassWarning{Dissertate}{Single-spaced mode on.}
 }
 \DeclareOption{ddouble}{\togglefalse{DissertateSingleSpace}}
-
+% \ExecuteOptions{dsingle}
 \ProcessOptions\relax
 
 % Line Spacing
 %   Define two line spacings: one for the body, and one that is more compressed.
 \iftoggle{DissertateSingleSpace}{
-    \newcommand{\dnormalspacing}{1.2}
-    \newcommand{\dcompressedspacing}{1.0}
+    \newcommand{\dnormalspacing}{1.5}
+    \newcommand{\dcompressedspacing}{1.2}
 }{
-    \newcommand{\dnormalspacing}{2.0}
+    \newcommand{\dnormalspacing}{1.5}
     \newcommand{\dcompressedspacing}{1.2}
 }
 
@@ -61,9 +61,16 @@
     {\begin{spacing}{\dcompressedspacing}\oldenumerate}
     {\endoldenumerate\end{spacing}}
 
+\newif\ifdraft
+\drafttrue % or \draftfalse
+
 % Text layout.
 \RequirePackage[width=5.75in, letterpaper]{geometry}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
 \usepackage{ragged2e}
+\usepackage{floatpag}
+\usepackage[export]{adjustbox}
 \RaggedRight
 \RequirePackage{graphicx}
 \begingroup\expandafter\expandafter\expandafter\endgroup
@@ -71,6 +78,7 @@
   \usepackage{fixltx2e}
 \fi
 \usepackage{booktabs}
+\usepackage{enumitem}
 \parindent 12pt
 \RequirePackage{lettrine}
 \RequirePackage{setspace}
@@ -78,17 +86,22 @@
 
 % Fonts.
 \RequirePackage{color}
+\usepackage{bbm}
 \RequirePackage{xcolor}
 \usepackage{hyperref}
 \RequirePackage{url}
 \RequirePackage{amssymb}
+\usepackage{amsmath}
 \RequirePackage{amsmath}
 \usepackage[]{algorithm2e}
+\newcommand\mycommfont[1]{\scriptsize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
 \RestyleAlgo{boxruled}
 \LinesNumbered
 \RequirePackage{mathspec}
-\setmathsfont(Digits,Latin,Greek)[Numbers={Proportional}]{EB Garamond}
+% \setmathsfont(Digits,Latin,Greek)[Numbers={Proportional}]{kpfonts}
 \setmathrm{EB Garamond}
+\usepackage{}
 \AtBeginEnvironment{tabular}{\addfontfeature{RawFeature=+tnum}}
 \widowpenalty=300
 \clubpenalty=300
@@ -118,6 +131,7 @@
 \setcounter{tocdepth}{1}
 \usepackage[titles]{tocloft}
 \usepackage[titletoc]{appendix}
+\newcommand{\indep}{\rotatebox[origin=c]{90}{$\models$}}
 \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
 \renewcommand{\cftchapfont}{\normalsize \scshape}
 \renewcommand\listfigurename{Listing of figures}
@@ -309,10 +323,12 @@
         \bibliography{references}
         \addcontentsline{toc}{chapter}{References}
         \bibliographystyle{apalike2}
-        \include{endmatter/colophon}
+        % \include{endmatter/colophon}
     \end{spacing}
 }
 
 \newcommand{\Expect}{{\rm I\kern-.3em E}}
 \newcommand{\Var}{\mathrm{Var}}
 \newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}

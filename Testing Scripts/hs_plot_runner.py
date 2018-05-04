@@ -7,7 +7,6 @@ import datetime
 import yaml
 import os
 import sys
-import psutil
 
 
 '''
@@ -17,56 +16,50 @@ out_dir
 data_loc_pref
 '''
 
-assert len(sys.argv) >= 2
+# python hs_test_plot_runner.py <sim_num> <fig_dir> <out_dir>
+
+assert len(sys.argv) == 4
 sim_num = int(sys.argv[1])
+fig_dir = str(sys.argv[2])
+out_dir = str(sys.argv[3])
 
-if len(sys.argv) > 2:
-    out_dir = str(sys.argv[2])
-else:
-    filename = "C:/Users/isaac/Dropbox/Harvard 17-18 Senior/Thesis/Results/ST_figs/"
-    if not os.path.exists(os.path.dirname(filename)):
-        try:
-            os.makedirs(os.path.dirname(filename))
-        except OSError as exc: # Guard against race condition
-            if exc.errno != errno.EEXIST:
-                raise
-    fig_dir = "C:/Users/isaac/Dropbox/Harvard 17-18 Senior/Thesis/Results/ST_figs/"
-    
+if not os.path.exists(os.path.dirname(fig_dir)):
+    try:
+        os.makedirs(os.path.dirname(fig_dir), exist_ok = True)
+    except OSError as exc: # Guard against race condition
+        if exc.errno != errno.EEXIST and os.path.isdir(fig_dir):
+            pass
+        else:
+            raise
 
-
-if len(sys.argv) > 3:
-    fig_dir = str(sys.argv[3])
-else:
-    out_dir = "C:/Users/isaac/Dropbox/Harvard 17-18 Senior/Thesis/Results/ST/"
-    
-
-
-reward_exp = None
-reward_0 = None
-reward_1 = None
+regret = None
 prob = None
 action = None
+opt = None
 fc_invoked = None
+theta_mse = None
+treatment_pred = None
 
-reward_exp = np.load(out_dir + "reward_exp_simNum" + str(sim_num) + ".npy")
-reward_0 = np.load(out_dir + "reward_0_simNum" + str(sim_num) + ".npy")
-reward_1 = np.load(out_dir + "reward_1_simNum" + str(sim_num) + ".npy")
+regret = np.load(out_dir + "regret_simNum" + str(sim_num) + ".npy")
 prob = np.load(out_dir + "prob_simNum" + str(sim_num) + ".npy")
 action = np.load(out_dir + "action_simNum" + str(sim_num) + ".npy")
+opt = np.load(out_dir + "opt_simNum" + str(sim_num) + ".npy")
 fc_invoked = np.load(out_dir + "fc_invoked_simNum" + str(sim_num) + ".npy")
+theta_mse = np.load(out_dir + "theta_mse_simNum" + str(sim_num) + ".npy")
+treatment_pred = np.load(out_dir + "treatment_pred_simNum" + str(sim_num) + ".npy")
 
-
-plot_QM1(reward_exp, reward_0, reward_1, prob, action, fc_invoked, title_end = " SimNum " + str(sim_num)).savefig(fig_dir + "QM1_simNum" + str(sim_num) + ".png")
-plot_QM1b(reward_exp, reward_0, reward_1, prob, action, fc_invoked, title_end = " SimNum " + str(sim_num)).savefig(fig_dir + "QM1b_simNum" + str(sim_num) + ".png")
-plot_QM1c(reward_exp, reward_0, reward_1, prob, action, fc_invoked, percentage_to_show=0.02, num_show = 5, title_end = " SimNum " + str(sim_num)).savefig(fig_dir + "QM1c_simNum" + str(sim_num) + ".png")
-
-plot_QM2(reward_exp, reward_0, reward_1, prob, action, fc_invoked, title_end = " SimNum " + str(sim_num)).savefig(fig_dir + "QM2_simNum" + str(sim_num) + ".png")
-plot_QM3(reward_exp, reward_0, reward_1, prob, action, fc_invoked, title_end = " SimNum " + str(sim_num)).savefig(fig_dir + "QM3_simNum" + str(sim_num) + ".png")
-plot_QM3b(reward_exp, reward_0, reward_1, prob, action, fc_invoked, percentage_to_show=0.05, title_end = " SimNum " + str(sim_num)).savefig(fig_dir + "QM3b_simNum" + str(sim_num) + ".png")
-
-plot_QM4(reward_exp, reward_0, reward_1, prob, action, fc_invoked, title_end = " SimNum " + str(sim_num)).savefig(fig_dir + "QM4_simNum" + str(sim_num) + ".png")
-plot_QM4b(reward_exp, reward_0, reward_1, prob, action, fc_invoked, title_end = " SimNum " + str(sim_num)).savefig(fig_dir + "QM4b_simNum" + str(sim_num) + ".png")
-plot_QM5(reward_exp, reward_0, reward_1, prob, action, fc_invoked, title_end = " SimNum " + str(sim_num)).savefig(fig_dir + "QM5_simNum" + str(sim_num) + ".png")
-plot_QM5b(reward_exp, reward_0, reward_1, prob, action, fc_invoked, percentage_to_show = 0.05, title_end = " SimNum " + str(sim_num)).savefig(fig_dir + "QM5b_simNum" + str(sim_num) + ".png")
-plot_QM6(reward_exp, reward_0, reward_1, prob, action, fc_invoked, title_end = " SimNum " + str(sim_num)).savefig(fig_dir + "QM6_simNum" + str(sim_num) + ".png")
-plot_QM6b(reward_exp, reward_0, reward_1, prob, action, fc_invoked, title_end = " SimNum " + str(sim_num)).savefig(fig_dir + "QM6b_simNum" + str(sim_num) + ".png")
+plot_QM1(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM1_simNum" + str(sim_num) + ".png")
+plot_QM2(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM2_simNum" + str(sim_num) + ".png")
+plot_QM3(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM3_simNum" + str(sim_num) + ".png")
+plot_QM4(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM4_simNum" + str(sim_num) + ".png")
+plot_QM5(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM5_simNum" + str(sim_num) + ".png")
+plot_QM6(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM6_simNum" + str(sim_num) + ".png")
+plot_QM7(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM7_simNum" + str(sim_num) + ".png")
+plot_QM8(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM8_simNum" + str(sim_num) + ".png")
+plot_QM9(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM9_simNum" + str(sim_num) + ".png")
+plot_QM10(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM10_simNum" + str(sim_num) + ".png")
+plot_QM11(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM11_simNum" + str(sim_num) + ".png")
+plot_QM12(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM11_simNum" + str(sim_num) + ".png")
+plot_QM13(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM11_simNum" + str(sim_num) + ".png")
+plot_QM14(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM11_simNum" + str(sim_num) + ".png")
+plot_QM15(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM11_simNum" + str(sim_num) + ".png")

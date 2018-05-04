@@ -6,41 +6,47 @@
 
 \begin{document}
 
+% \drafttrue
+\draftfalse
+
 % the front matter
 \input{frontmatter/personalize}
 % \maketitle
 % \copyrightpage  
-% \frontmatter UNCOMMENT
+\frontmatter % UNCOMMENT
 \setstretch{\dnormalspacing}
 % \abstractpage
-\tableofcontents
+% \tableofcontents
 % %\authorlist
 % \listoffigures
 % \dedicationpage
 % \acknowledgments
 
 % \doublespacing
+% \toggletrue{ToggleCondition}
+
 
 % include each chapter...
 \setcounter{chapter}{0}  % start chapter numbering at 1
-% \include{chapters/introduction} UNCOMMENT
-\include{chapters/questions}
-\include{chapters/data}
-\include{chapters/methods}
+\include{chapters/introduction} % UNCOMMENT
+% \include{chapters/questions}
+\include{chapters/heartsteps}
+\include{chapters/bandits}
 \include{chapters/models}
+\include{chapters/methods}
 \include{chapters/results} %UNCOMMENT
-\include{chapters/discussion} %UNCOMMENT
+% \include{chapters/discussion} %UNCOMMENT
 \include{chapters/conclusion} %UNCOMMENT
 
 \setstretch{\dnormalspacing}
 
 % the back matter
-% \backmatter UNCOMMENT
+\backmatter %UNCOMMENT
 
-% \clearpage
+\clearpage
 % \bibliography{references}
-% \addcontentsline{toc}{chapter}{References}
-% \bibliographystyle{apalike2}
+\addcontentsline{toc}{chapter}{References}
+% \bibliographystyle{apalike}
 
 % \include{endmatter/colophon}
 

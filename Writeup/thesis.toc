@@ -1,18 +1,50 @@
-\contentsline {chapter}{\numberline {1}Questions}{3}{chapter.1}
-\contentsline {chapter}{\numberline {2}Data}{5}{chapter.2}
-\contentsline {chapter}{\numberline {3}Methods}{6}{chapter.3}
-\contentsline {section}{\numberline {3.1}Methodology Overview}{8}{section.3.1}
-\contentsline {section}{\numberline {3.2}Reward Generative Model}{8}{section.3.2}
-\contentsline {section}{\numberline {3.3}Cross-Validation}{10}{section.3.3}
-\contentsline {section}{\numberline {3.4}Residual Formation}{11}{section.3.4}
-\contentsline {section}{\numberline {3.5}Simulated User Generation}{11}{section.3.5}
-\contentsline {section}{\numberline {3.6}Training Bandit Algorithm Tuning Parameters}{12}{section.3.6}
-\contentsline {section}{\numberline {3.7}Simulated User Testing and Quality Metrics}{12}{section.3.7}
-\contentsline {chapter}{\numberline {4}Models}{14}{chapter.4}
-\contentsline {section}{\numberline {4.1}Reward Generative Models}{15}{section.4.1}
-\contentsline {subsection}{\numberline {4.1.1}Basic Linear Generative Model}{15}{subsection.4.1.1}
-\contentsline {subsection}{\numberline {4.1.2}Additional Models}{15}{subsection.4.1.2}
-\contentsline {section}{\numberline {4.2}Bandit Algorithm Variants}{15}{section.4.2}
-\contentsline {chapter}{\numberline {5}Results}{18}{chapter.5}
-\contentsline {chapter}{\numberline {6}Discussion}{20}{chapter.6}
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}
+\contentsline {chapter}{\numberline {2}HeartSteps}{2}{chapter.2}
+\contentsline {section}{\numberline {2.1}Randomized Choices: HeartSteps v1}{2}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}HeartSteps Data and JITAI Notation}{2}{subsection.2.1.1}
+\contentsline {section}{\numberline {2.2}The Power of Learning: HeartSteps v2}{3}{section.2.2}
+\contentsline {chapter}{\numberline {3}Contextual Multi-armed Bandits}{4}{chapter.3}
+\contentsline {section}{\numberline {3.1}Contextual Bandits and Thompson Sampling}{4}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Thompson Sampling}{4}{subsection.3.1.1}
+\contentsline {section}{\numberline {3.2}Application Survey of Contextual Bandits}{5}{section.3.2}
+\contentsline {chapter}{\numberline {4}Models and Algorithms}{6}{chapter.4}
+\contentsline {section}{\numberline {4.1}Replayer: True Reward Model}{6}{section.4.1}
+\contentsline {section}{\numberline {4.2}Bandit Reward Models}{6}{section.4.2}
+\contentsline {section}{\numberline {4.3}Bandit Algorithm Features}{6}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}Batch Model Update: Daily Model Updates}{7}{subsection.4.3.1}
+\contentsline {subsection}{\numberline {4.3.2}Time Varying Reward Function: Gaussian Process Prior}{7}{subsection.4.3.2}
+\contentsline {section}{\numberline {4.4}Thompson Sampling Variants}{9}{section.4.4}
+\contentsline {subsection}{\numberline {4.4.1}Action Centering}{9}{subsection.4.4.1}
+\contentsline {subsection}{\numberline {4.4.2}Feedback Controller}{9}{subsection.4.4.2}
+\contentsline {subsection}{\numberline {4.4.3}Probability Clipping}{9}{subsection.4.4.3}
+\contentsline {section}{\numberline {4.5}Training Bandit Algorithm Tuning Parameters}{11}{section.4.5}
+\contentsline {chapter}{\numberline {5}Methods and Experiments}{13}{chapter.5}
+\contentsline {section}{\numberline {5.1}Methodology Overview}{14}{section.5.1}
+\contentsline {section}{\numberline {5.2}Reward Generative Model}{14}{section.5.2}
+\contentsline {section}{\numberline {5.3}Cross-Validation}{15}{section.5.3}
+\contentsline {section}{\numberline {5.4}Residual Formation}{15}{section.5.4}
+\contentsline {section}{\numberline {5.5}Simulated User Generation}{15}{section.5.5}
+\contentsline {section}{\numberline {5.6}Simulated User Testing and Quality Metrics}{15}{section.5.6}
+\contentsline {chapter}{\numberline {6}Results}{16}{chapter.6}
+\contentsline {section}{\numberline {6.1}Randomized Treatment}{16}{section.6.1}
+\contentsline {section}{\numberline {6.2}Impact of Bandit Features}{17}{section.6.2}
+\contentsline {subsection}{\numberline {6.2.1}Overall $MUER$}{17}{subsection.6.2.1}
+\contentsline {subsection}{\numberline {6.2.2}Action Centering}{20}{subsection.6.2.2}
+\contentsline {subsection}{\numberline {6.2.3}Feedback Controller}{20}{subsection.6.2.3}
+\contentsline {subsection}{\numberline {6.2.4}Probability Clipping}{20}{subsection.6.2.4}
+\contentsline {subsection}{\numberline {6.2.5}Small Contexts}{20}{subsection.6.2.5}
+\contentsline {section}{\numberline {6.3}Impact of Tuning Parameters}{20}{section.6.3}
+\contentsline {subsection}{\numberline {6.3.1}$\mathtt {N\_c\_mult}$}{20}{subsection.6.3.1}
+\contentsline {subsection}{\numberline {6.3.2}$\mathtt {T\_c}$}{20}{subsection.6.3.2}
+\contentsline {subsection}{\numberline {6.3.3}$\mathtt {sig2\_mult}$}{20}{subsection.6.3.3}
+\contentsline {subsection}{\numberline {6.3.4}$\mathtt {gamma}$}{21}{subsection.6.3.4}
+\contentsline {subsection}{\numberline {6.3.5}$\mathtt {lamb}$}{21}{subsection.6.3.5}
+\contentsline {subsection}{\numberline {6.3.6}$\mathtt {prior\_cov\_mult}$}{21}{subsection.6.3.6}
 \contentsline {chapter}{\numberline {7}Conclusion}{22}{chapter.7}
+\contentsline {chapter}{Appendix \numberline {A}Appendix of Figures}{24}{Appendix.1.A}
+\contentsline {section}{\numberline {A.1}Summary Figures}{24}{section.1.A.1}
+\contentsline {section}{\numberline {A.2}Quality Metric Figures}{24}{section.1.A.2}
+\contentsline {section}{\numberline {A.3}Parameter Tuning vs $MUER$ Figures}{24}{section.1.A.3}
+\contentsline {subsection}{\numberline {A.3.1}$MUER$ Minimization Parameter Optimization}{24}{subsection.1.A.3.1}
+\contentsline {subsection}{\numberline {A.3.2}Standard Deviation Cutoff Parameter Optimization}{24}{subsection.1.A.3.2}
+\contentsline {chapter}{References}{47}{chapter*.45}

@@ -1,5 +1,13 @@
 This is BibTeX, Version 0.99dThe top-level auxiliary file: thesis.aux
-A level-1 auxiliary file: chapters/chapter1.aux
-I found no \bibdata command---while reading file thesis.aux
-I found no \bibstyle command---while reading file thesis.aux
-(There were 2 error messages)
+A level-1 auxiliary file: chapters/introduction.aux
+A level-1 auxiliary file: chapters/heartsteps.aux
+A level-1 auxiliary file: chapters/bandits.aux
+A level-1 auxiliary file: chapters/models.aux
+A level-1 auxiliary file: chapters/methods.aux
+A level-1 auxiliary file: chapters/results.aux
+A level-1 auxiliary file: chapters/conclusion.aux
+A level-1 auxiliary file: chapters/appendixA.aux
+The style file: apalike2.bst
+Database file #1: references.bib
+Warning--empty journal in Agrawal2012
+(There was 1 warning)
