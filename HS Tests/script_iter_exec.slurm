@@ -10,8 +10,8 @@
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=isaacxia@college.harvard.edu
 module load python/3.6.0-fasrc01
-echo test_exec.py ${SLURM_ARRAY_TASK_MAX} ${SLURM_ARRAY_TASK_ID} $num_vals $tot_runs $yaml_loc $out_dir $fig_dir ~/HS_data/ hs_test_runner.py
-python test_exec.py ${SLURM_ARRAY_TASK_MAX} ${SLURM_ARRAY_TASK_ID} $num_vals $tot_runs $yaml_loc $out_dir $fig_dir ~/HS_data/ hs_test_runner.py
+echo test_exec.py ${SLURM_ARRAY_TASK_MAX} ${SLURM_ARRAY_TASK_ID} $num_vals $tot_runs $yaml_loc $out_dir $fig_dir $data_dir hs_test_runner.py
+python test_exec.py ${SLURM_ARRAY_TASK_MAX} ${SLURM_ARRAY_TASK_ID} $num_vals $tot_runs $yaml_loc $out_dir $fig_dir $data_dir hs_test_runner.py
 # python hs_test_runner.py 0 results_train11112/ ~/HS_data/ yamls_train11112/
 #echo "$ac$fc\_hi$pc"
 #python hs_test_runner.py 0 results_test/ ~/HS_data/ yamls0000/ 0 0 0 0
