@@ -4,9 +4,9 @@ import statsmodels.api as sm
 from scipy.stats import norm
 
 
-#################
+################
 # Test Bed 5/4 #
-#################
+################
 # HS Analysis Functions
 
 ### Aux Functions for reading two different .csv files ###

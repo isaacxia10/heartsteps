@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import itertools
 import datetime
+import seaborn as sns
 # QM 1 Regret
 def plot_QM1(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, y_size = 5, x_size = 10, alpha = 0.005, title_end = ""):
     ''' Time series of cumulative expected regret averaged over all t for all users as well as for all users
@@ -468,7 +469,7 @@ def plot_QM13(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, 
         x = tp.loc[tp.index[(tp.index / 7).astype(int) == week_num]].values.flatten()
         y = p.loc[p.index[(p.index / 7).astype(int) == week_num]].values.flatten()
         sns.regplot(x=x, y=y, scatter_kws={"color": "blue","alpha":alpha}, line_kws={"color": "black"}, ax=ax)
-        fit = sm.OLS(endog=y, exog=x).fit()
+        fit = sm.OLS(endog=y, exog=x, missing="drop").fit()
         ax.set_title(r"Week %i; $\hat{\beta}=%1.6f$, $r^2=%1.6f$"%(week_num+1,fit.params[0],fit.rsquared))
         ax.set_xlabel(r"$\theta_2^T f_2(S)$ (Treatment Effect)")
         ax.set_ylabel(r"$\pi_t(1  | S_t)$")

@@ -24,7 +24,7 @@ We investigate the utility of including each feature of the Bandit in this secti
 
 Below, we summarize statistics for $MUER$, with $N = 2500$ in each batch, for a total of $N = 7500$ in each averaged test.  We evaluate the quality of a bandit variant based on two axes: minimizing average $MUER$ and minimizing the total standard deviation of $MUER$.  The average $MUER$ measures the overall efficacy of the bandit variant, while the standard deviation of $MUER$ measures the fairness of treatment personalization.
 
-In \ref{Boxplots of MUER for all Bandit Variants, sorted by mean MUER}, we note that while the mean $MUER$ does not favor more feature-laden bandit variants, we see that they serve well to reduce the variance, especially in the testing set.  The overall variance is minimized for variant ac fc pc, which is our full variant including action centering, feedback controlling, and probability clipping, while using the Full set of contextual features in the bandit model.
+In \ref{Boxplots of MUER for all Bandit Variants, sorted by mean MUER}, we note that while the mean $MUER$ does not favor more feature-laden bandit variants, we see that they serve well to reduce the variance, especially in the testing set.  The overall variance is minimized for variant ac fc pc, which is our full variant including action centering, feedback controlling, and probability clipping, while using the Full set of contextual features in the bandit model.  In the diagram, we also present the decomposition of total variance into within-user variance and between-user variance, discussed further in Section \ref{Variance Decomposition}.
 
 
 In figure \ref{Cumulative Regrets for all Bandit Variants}, in particular for the full variant in dotted green, we see that the slope of the training cumulative regret starts off shallower than that of testing.  However, there is some concavity in the cumulative regret for the testing batches. Although the full variant has worse mean cumulative regret than most other variants at earlier time points, it evens out and is comparable to the others by the end.
@@ -40,7 +40,7 @@ One important note for figure \ref{Cumulative Regrets for all Bandit Variants} i
 
 \begin{figure}[H]
 \includegraphics[width=1.25\textwidth,center]{figures/boxplots_muer.png}%
-\caption{Boxplots of MUER for all Bandit Variants, sorted by mean $MUER$.  Mean in Green, Median in Orange.  Lower means and lower variance indicate better performance.}
+\caption{Boxplots of MUER for all Bandit Variants, sorted by mean $MUER$.  Mean in Green, Median in Orange.  Lower means and lower variance indicate better performance.  Variance Decomposition shown in label under each Variant name: $\langle\textit{Total Var}\rangle = \langle\textit{Within Var}\rangle + \langle\textit{Between Var}\rangle$}
 \label{Boxplots of MUER for all Bandit Variants, sorted by mean MUER}
 \end{figure}
 
@@ -54,7 +54,56 @@ One important note for figure \ref{Cumulative Regrets for all Bandit Variants} i
 
 \clearpage
 
+\subsection{$MUER$ Variance Decomposition}
+\label{Variance Decomposition}
 
+We study the decompsition of the Total Variance in simulated $MUER$ into Within-User Variance and Betweeen-User Variance.  As we bootstrapped to obtain simulation users, we can reindex to match each simulation user with the $i$-th trial for real user $n$.  Let $Num(n)$ denote the number of times user $n$ was sampled within our set of simulation users.
+
+As we reindex, we denote that simulation $i$ for user $n$ has $MUER$ as $MUER_{n,i}$.  Then, the mean $MUER$ for user $n$ is computed by averaging all $Num(n)$ simulation trials, which we denote as $\overline{MUER}_{n}$.  Finally, we can denote the overall weighted mean across all users as $\overline{MUER}$, which is computed by weighting each user's mean MUER by $Num(n)$.  Recalling that $N = 37$ is the number of real users from the original HeartSteps v1 study while $2500$ is the number of bootstrapped simulation users, we summarize our decompsitions as such:
+
+\begin{align}
+\sigma^2_{total} &= \sigma^2_{within} + \sigma^2_{between} \\
+\sigma^2_{total} &:= \frac{1}{2500} \sum_{n=1}^N \sum_{i=1}^{Num(n)} \left(MUER_{n,i} - \overline{MUER}\right)^2 \\
+\sigma^2_{within} &:= \frac{1}{2500} \sum_{n=1}^{N} \sigma^2_{within,n} \cdot Num(n) \\
+\sigma^2_{within,n} &:= \frac{1}{Num(n)} \sum_{i=1}^{Num(n)} \left(MUER_{n,i} - \overline{MUER}_{n}\right)^2 \\
+\sigma^2_{between} &:=  \frac{1}{N} \sum_{n=1}^{N} \left(\overline{MUER}_{n} - \overline{MUER} \right)^2
+\end{align}
+
+In table \ref{Variance Decomposition Table}, we report the simulation results; these are also depicted in the boxplots of figure \ref{Boxplots of MUER for all Bandit Variants, sorted by mean MUER}.
+
+  \begin{table}[H]
+\centering
+\begin{tabular}{llrrr}
+\toprule
+{} &  Batch &  Total var &  Within var &  Between var \\
+\midrule
+ac             &   Test &   2.661305 &    1.854323 &     0.806983 \\
+No Features    &   Test &   2.804786 &    1.856737 &     0.948049 \\
+pc             &   Test &   3.144949 &    2.359168 &     0.785780 \\
+small          &   Test &   3.162685 &    2.706956 &     0.455729 \\
+fc pc          &   Test &   3.358141 &    2.414217 &     0.943925 \\
+ac fc          &   Test &   3.382839 &    1.980111 &     1.402729 \\
+ac fc pc       &   Test &   3.385391 &    2.016630 &     1.368761 \\
+fc             &   Test &   3.407053 &    2.486476 &     0.920577 \\
+ac fc pc small &   Test &   3.504155 &    2.074450 &     1.429705 \\
+ac pc          &   Test &   6.071459 &    0.486644 &     5.584816 \\
+No Features    &  Train &   2.523148 &    1.848379 &     0.674769 \\
+ac fc          &  Train &   2.592400 &    1.728600 &     0.863799 \\
+ac fc pc       &  Train &   3.062984 &    2.010644 &     1.052340 \\
+fc             &  Train &   3.088712 &    2.424037 &     0.664676 \\
+small          &  Train &   3.097342 &    2.599052 &     0.498290 \\
+fc pc          &  Train &   3.123756 &    2.280590 &     0.843166 \\
+ac fc pc small &  Train &   3.222406 &    1.889396 &     1.333010 \\
+ac             &  Train &   3.239059 &    2.276554 &     0.962505 \\
+pc             &  Train &   3.334281 &    2.360475 &     0.973806 \\
+ac pc          &  Train &   3.719548 &    0.524511 &     3.195038 \\
+\bottomrule
+\end{tabular}
+\caption{Variance decomposition into Within-User and Between-User Variance, averaged across $k = 3$ split batches.}
+\label{Variance Decomposition Table}
+\end{table}
+
+\clearpage
 
 \subsection{Action Centering}
 
@@ -126,7 +175,7 @@ There is virtually no effect on the mean, except for a $1\%$ fluctuation around 
 
 \subsection{$\mathtt{prior\_cov\_mult}$}
 
-For the multiplier on $\Sigma_\Theta = \mathbb{I}$, we see that it does not majorly impact the mean nor StdDev $MUER$ -- however, it has a fairly consistent effect in that the 
+For the multiplier on $\Sigma_\Theta = \mathbb{I}$, we see that it does not majorly impact the mean nor StdDev $MUER$ -- however, lower values of the multiplier consistently decreases the mean $MUER$ while increasing the StdDev $MUER$.
 
 While the effect on the mean is about $1\%$ and fairly constant the effect on StdDev $MUER$ is between $5\% - 10\%$ and always decreasing.
 

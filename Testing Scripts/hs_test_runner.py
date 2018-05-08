@@ -200,12 +200,11 @@ regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, bandit = run_s
 # dats = [reward_exp,reward_0,reward_1,prob,action,fc_invoked,bandit_mean]
 
 # Without bandit_mean
-if not final_flag:
-    datNames = ["regret","prob","action","opt","fc_invoked","theta_mse","treatment_pred"]
-    dats = [regret,prob,action,opt,fc_invoked,theta_mse,treatment_pred]
+datNames = ["regret","prob","action","opt","fc_invoked","theta_mse","treatment_pred"]
+dats = [regret,prob,action,opt,fc_invoked,theta_mse,treatment_pred]
 
-    for dat, datName in zip(dats, datNames):
-        np.save(out_dir + datName + "_simNum" + str(sim_num) + ".npy", dat)
+for dat, datName in zip(dats, datNames):
+    np.save(out_dir + datName + "_simNum" + str(sim_num) + ".npy", dat)
 
 # OPTIONAL
 if final_flag:
