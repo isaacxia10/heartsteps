@@ -1,0 +1,24 @@
+%!TEX root = ../thesis.tex
+\chapter{Conclusion}
+\label{conclusion}
+
+In this thesis, we have evaluated the performance of adding various features to variants of the Thompson Sampler, applied to the MAB problem in HeartSteps.  These were used to make recommendations guiding the design of the HeartSteps v2 application.  
+
+We considered both the average efficacy of treatment in evaluation, as well as the fairness in treatment; these were measured through the mean and standard deviation of $MUER$ (Mean User Expected Regret), where lower means and lower standard deviations are more desirable.  
+
+Empirically, we have the following recommendations and findings:
+
+\begin{itemize}
+	\item We should use the full set of contextual features, as using the full set of contextual features does not cause the bandit to overfit, but rather improves the variation between per-user $MUER$ while maintaining mean $MUER$.
+	\item Action centering greatly reduces the complexity of the model that the bandit must correctly specify to optimally select actions, and is seen to reduce the variance of $MUER$. 
+	\item We suggest including the Feedback controller to thin out both the intensity and frequency of patients receiving poor treatments, as well as address user disengagement concerns.
+	\item Probability clipping must be included for the bandit to continue learning as well as not to overwhelm or disengage the user, and we have seen that the variants removing probability clipping do not serve to improve performance.
+\end{itemize}
+
+Future work may include the following suggestions.
+
+\begin{enumerate}
+	\item Tuning the Gaussian Process Prior generally yielded a value $\gamma$ very close to $1$, in which case we have a stationary reward function; this suggests that the reward function is not overly non-stationary, or there are heavy delayed reward effects.  It is worth exploring how to better model these effects, and whether the Gaussian Process Prior is masquerading as a solution to a more fundamental challenge.
+	\item Adjusting the batch update process may be investigated; although currently at the end of every day, less variation in $MUER$ or model overfitting may occur with more infrequent batch updating.
+	\item Variation in the data generating process model.  We assumed the same linear model that generated our rewards in section \ref{Models/Reward Generative Models}, but it is unclear whether this is a valid assumption.  It is worth investigating whether our findings hold if these contextual features are included in a GLM or non-linear reward model.
+\end{enumerate}

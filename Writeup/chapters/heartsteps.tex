@@ -1,0 +1,93 @@
+%!TEX root = ../thesis.tex
+\begin{savequote}[75mm]
+Exercise should be regarded as tribute to the heart.
+\qauthor{Gene Tunny}
+\end{savequote}
+
+\chapter{HeartSteps}
+
+\newthought{In the 21st century, cardiovascular disease is the leading cause of death} across all regions other than Africa \citep{WorldHealth2012}.  Fortunately, while treatment is often difficult, \citet{McGill2008} estimates that nearly $90\%$ of cardiovascular diseases are preventable and are associated with several key risk factors.  One key preventative measure is the incorporation of physical activity, which can be readily addressed via mHealth using JITAI -- a novel study investigating the efficacy and optimal methodology of suggesting physical activity is {\it HeartSteps}.
+
+In the HeartSteps study, multiple small check-ins are scheduled each day at which point one of three actions may be taken by the application: no message may be transmitted, an anti-sedentary message to get up may be transmitted, or a physical activity message to take a walk may be transmitted.  Each suggestion was delivered as a mobile notification to the user at the same decision time point during the day and was intended to generate an immediate effect of getting up or walking around within the subsequent hour.
+
+We introduce the purpose and protocol of HeartSteps v1 as in \citet{Smith2017}, the first iteration that randomly selected actions and observed behavior, as well as guiding principles for HeartSteps v2, a future iteration of the study that will utilize the learned data and apply reinforcement learning to personalize treatments to patients.
+
+
+% Introduce HeartSteps, purpose, core concept
+% Reduce Heart disease, small check-ins per day
+
+\section{Randomized Choices: HeartSteps v1}
+
+In the first iteration of HeartSteps, actions were randomly selected; no message was sent with probability $60\%$, and physical activity as well as anti-sedentary messages were sent with probability $20\%$.  This unequal balance was chosen to reduce participation burden on the users.  Each of the two suggestions types was furthermore customized based on specific contextual data measured by the user's mobile phone or fitness tracker, such as weather conditions, location information, and recent step-count.
+
+The $D=5$ decision points throughout the day were scheduled corresponding to the morning commute, mid-day, mid-afternoon, evening commute, and post-dinner times, and are chosen with user input to minimize inconvenient suggestion times.
+
+For the purposes of this project, we only consider the difference between sending no suggestion (encoded as action $0$) and sending a physical activity suggestion (encoded as action $1$).
+
+% HeartSteps 1 methodology, data collection, and Features
+
+
+\subsection{HeartSteps Data and JITAI Notation}
+
+	We adopt the following notation as in \citet{Liao2015}, summarized in table \ref{Notation Table}.  Throughout, we refer to times as a tuple $(t,d)$ of day $1 \le t \le T$ and decision time point $1 \le d \le D = 5$, and use the notation $(t,d) + k$ as $k$ decision time points after the time point of $(t,d)$, so that $$\scriptstyle \scriptsize (t,d) + 1 = \begin{cases}
+(t,d+1);\ \  1 \le d \le 4 \\
+(t+1, 1); \ \ d = 5.
+\end{cases}$$
+	At every time point $(t,d)$ of day $1 \le t \le T$ and decision point $1 \le d \le D$, there is a contextual feature vector $S_{(t,d)} \in \mathcal{S}$ with $7$ elements, a chosen action $A_{(t,d)} \in \{0,1\}$ of activity suggestion, and the observed reward $R_{(t,d)+1} \in \mathbb{R}$.  
+	
+	Note that the reward $R_{(t,d)+1}$ has the subsequent time index, but results from observation of taking action $A_{(t,d)}$ in context $S_{(t,d)}$.  To summarize a history of the data, we denote the set of variables up until time $(t,d)$ as $\mathcal{H}_{(t,d)}\left\{S_{(t',d')}, A_{(t',d')}, R_{(t',d') + 1} \right\}_{(t',d') < (t,d)}$\label{HistorySet}.
+
+	  \begin{table}
+	 \caption{HeartSteps v2 Notation}
+	 \label{Notation Table}
+	 \centering \begin{tabular*}
+	{0.987\textwidth}
+	{|p{0.18\textwidth}|p{0.22\textwidth}|p{0.50\textwidth}|}
+	\toprule
+	Term & Name & Description \\
+	\midrule
+	$\mathcal{S},S_{n,t,d}$ & Context & Set of 7 contextual features     \\
+	$p_1$ & Baseline features dimension & Full model consists of 7 features with 1 bias term, Small model consists of 2 with 1 bias term \\
+	$p_2$ & Interaction features dimension & Full model consists of 3 features with 1 bias term, Small model consists of 2 with 1 bias term \\
+	$\mathcal{A}, a_{n,t,d}$ & Actions &  Binary -- $1$: active message sent, $0$: no active message sent   \\
+	$\mathcal{R}, R_{n,t,d}$ & Reward &  Log-transformed step count in $30$ minutes following decision point  \\
+	$f_1 : \mathcal{S} \to \mathbb{R}^{p_1}$ & Baseline feature mapping & Maps context to baseline features \\
+	$f_2 : \mathcal{S} \to \mathbb{R}^{p_2}$ & Interaction feature mapping & Maps context to interaction features, which are multiplied by $\mathcal{A}$ \\
+	$\Theta$ & `True' generative model coefficients & From regression on HSv1 data:\newline $\mathcal{R} \sim [f_1(\mathcal{S}), f_2(\mathcal{A} \cdot \mathcal{S})]^T\Theta$ \\
+	$\varepsilon, \epsilon_{n,t,d}$ & Linear model residuals & Residuals from HSv1 data after regression \\
+	$N$ & Number of users  & $N = 37$ in HSv1; $N = 2500$ in simulations \\
+	$T$ & Number of days in study & $T = 42$  \\
+	$D$ & Number of decision points per day &  $D = 5$ \\
+	$K$ & Number of cross-validations per test & Set to $K = 3$ 
+	\\\bottomrule
+	\end{tabular*}
+	  \end{table}
+
+
+
+\section{The Power of Learning: HeartSteps v2}
+
+	Using the randomized data collected from HeartSteps v1, the next phase of the study is to apply this data to both test variations of reinforcement learning algorithms and provide priors on their initializations in the next iteration, HeartSteps v2.  In this section, we discuss overarching goals to guide the design of our algorithm to motivate the design of our algorithm subsequent sections.
+
+	Our primary goal is to maximize the reward throughout the time period, which is the overall number of steps.  However, due to the complex and individualized nature of human behavior, there is an inherent exploration-exploitation trade-off.  We want to ensure that the HeartSteps algorithm does not suffer from a poor initialization and forever select actions based on its poor reward model, hereby invoking exploitation too quickly.
+
+	Next, our model should be flexible enough to account for non-stationary reward functions, as users may change their preferences over the course of the study based on latent contextual features.
+
+	Finally, we aim to avoid user disengagement from the application, which may lead to disuse or uninstallation. Disengagement can be caused by a variety of reasons relating to overburdening, distrust, or annoyance -- if users receive too many suggestions to walk around, receive suggestions to walk outside in inclement weather, or receive suggestions to walk around shortly after completing a brief jog, they are more likely to disengage from future suggestions, prematurely ending or compromising treatment for the user.
+
+
+
+
+	% We discuss several challenges that present themselves in developing a learning algorithm to select a personalized optimal series of actions based on universal behavior tendencies as well as individual behavior tendencies. As well as goals to guide design of 
+
+
+
+
+% Noisy data, lots of features which may or may not be relevant; differences in user 
+% Records what sort of data
+% Proposal for HeartSteps 2:
+% Use randomized contexts to try to maximize overall reward, or minimize overall regret
+% (HS v2 Protocol)
+% Difficulties encountered:
+% ???
+

@@ -410,83 +410,104 @@ def plot_QM11(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, 
 
 
 
-# QM 12 Treatment Effect KDE and Timeseries
-def plot_QM12(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, y_size = 5, x_size = 14, alpha = 0.005, title_end = "", t = 5):
-    ''' Treatment effect (\theta_2^T f_2(S)) KDE by week in plot 1, time series of mean/median/quantiles in plot 2
+# QM 12 Treatment Effect KDE
+def plot_QM12(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, y_size = 5, x_size = 7, title_end = "", t = 5):
+    ''' Treatment effect (\theta_2^T f_2(S)) KDE by week
     '''
     
     max_day = prob.shape[1] // t
     
-    fig, axes = plt.subplots(1,2,figsize = (x_size,y_size))
+    fig, ax = plt.subplots(figsize = (x_size,y_size))
 
     tp = pd.DataFrame(treatment_pred.T)
 
     for week_num, in zip(range(max_day//7)):
-        x = tp.loc[tp.index[(tp.index / 7).astype(int) == week_num]].values.flatten()
-        sns.distplot(x,ax = axes[0],label="Week %i"%(week_num+1),bins=50)
-    axes[0].legend()
+        x = tp.loc[tp.index[(tp.index / (7*5)).astype(int) == week_num]].dropna().values.flatten()
+        if x.shape[0] > 0:
+            sns.distplot(x,ax = ax,label="Week %i"%(week_num+1),bins=100)
+    ax.legend()
 
-    axes[0].set_title("Treatment Effect Density by Treatment Week")
-    axes[0].set_xlabel(r"$\theta_2^T f_2(S)$ (Treatment Effect)")
-    axes[0].set_ylabel("p (Density)")
+    ax.set_title("Treatment Effect Density by Treatment Week")
+    ax.set_xlabel(r"$\theta_2^T f_2(S)$ (Treatment Effect)")
+    ax.set_ylabel("Count")
+    
+    fig.tight_layout()
+    
+    return fig
 
+# QM 13 Treatment Effect Timeseries
+def plot_QM13(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, y_size = 5, x_size = 7, alpha = 0.005, title_end = "", t = 5):
+    ''' Treatment effect (\theta_2^T f_2(S)) time series of mean/median/quantiles
+    '''
+    
+    max_day = prob.shape[1] // t
+    
+    fig, ax = plt.subplots(figsize = (x_size,y_size))
+
+    tp = pd.DataFrame(treatment_pred.T)
 
     out = pd.DataFrame({"5%": tp.quantile(0.05,axis=1),"25%": tp.quantile(0.25,axis=1),"40%": tp.quantile(0.40,axis=1),"Median": tp.quantile(0.5,axis=1),"60%": tp.quantile(0.60,axis=1),"75%":tp.quantile(0.75,axis=1),"95%": tp.quantile(0.95,axis=1),"Mean": tp.mean(axis=1)})
-    out[["5%","25%","40%","60%","75%","95%"]].plot(ax=axes[1], color = ["darkgoldenrod","gold","yellowgreen","skyblue","steelblue","b"],linewidth=0.5)
-    out["Mean"].plot(ax=axes[1],color="k",linewidth=2.)
-    out["Median"].plot(ax=axes[1],color="green",linewidth=2.)
-    axes[1].fill_between(out.index, out["40%"], out["Median"],color='k',alpha=0.2)
-    axes[1].fill_between(out.index, out["40%"], out["25%"],color='k',alpha=0.085)
-    axes[1].fill_between(out.index, out["5%"], out["25%"],color='k',alpha=0.02)
-    axes[1].fill_between(out.index, out["60%"], out["Median"],color='k',alpha=0.2)
-    axes[1].fill_between(out.index, out["60%"], out["75%"],color='k',alpha=0.085)
-    axes[1].fill_between(out.index, out["75%"], out["95%"],color='k',alpha=0.02)
-    leg = axes[1].legend()
+    out[["5%","25%","40%","60%","75%","95%"]].plot(ax=ax, color = ["darkgoldenrod","gold","yellowgreen","skyblue","steelblue","b"],linewidth=0.5)
+    out["Mean"].plot(ax=ax,color="k",linewidth=2.)
+    out["Median"].plot(ax=ax,color="green",linewidth=2.)
+    ax.fill_between(out.index, out["40%"], out["Median"],color='k',alpha=0.2)
+    ax.fill_between(out.index, out["40%"], out["25%"],color='k',alpha=0.085)
+    ax.fill_between(out.index, out["5%"], out["25%"],color='k',alpha=0.02)
+    ax.fill_between(out.index, out["60%"], out["Median"],color='k',alpha=0.2)
+    ax.fill_between(out.index, out["60%"], out["75%"],color='k',alpha=0.085)
+    ax.fill_between(out.index, out["75%"], out["95%"],color='k',alpha=0.02)
+    leg = ax.legend()
     for legobj in leg.legendHandles:
         legobj.set_linewidth(3)
 
-    axes[1].set_title("Treatment Effect over Time " + str(title_end))
+    ax.set_title("Treatment Effect over Time " + str(title_end))
 
-    axes[1].set_xlabel(r"$\theta_2^T f_2(S)$ (Treatment Effect)")
-    axes[1].set_xlabel("t (Decision Point)")
+    ax.set_xlabel(r"$\theta_2^T f_2(S)$ (Treatment Effect)")
+    ax.set_xlabel("t (Decision Point)")
+
 
 
     fig.tight_layout()
     
     return fig
 
-
-
-# QM 13 Action Probability versus Treatment Effect
-def plot_QM13(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, y_size = 8, x_size = 15, alpha = 0.04, marker_size = 2, title_end = "", t = 5):
+# QM 14 Action Probability versus Treatment Effect
+def plot_QM14(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, y_size = 8, x_size = 15, alpha = 0.02, marker_size = 1, title_end = "", t = 5):
     ''' Scatter by Study week of probs (\pi_t(1 | S_t)) versus Treatment Effect (\Theta_2^T f_2(S))
     '''
     max_day = prob.shape[1] // t
-    
+
     num_rows = 2
-    fig, axes = plt.subplots(num_rows, int(np.ceil((max_day / 7 / num_rows))),figsize = (x_size,y_size),sharey = True, sharex = True)
+    fig, axes = plt.subplots(num_rows, int(np.ceil((max_day / 7 / num_rows))),figsize = (x_size,y_size))
 
     p = pd.DataFrame(prob.T)
     tp = pd.DataFrame(treatment_pred.T)
 
     for week_num,ax in zip(range(max_day//7),axes.flatten()):
-        x = tp.loc[tp.index[(tp.index / 7).astype(int) == week_num]].values.flatten()
-        y = p.loc[p.index[(p.index / 7).astype(int) == week_num]].values.flatten()
-        sns.regplot(x=x, y=y, scatter_kws={"color": "blue","alpha":alpha,'s':marker_size}, line_kws={"color": "black"}, ax=ax)
-        fit = sm.OLS(endog=y, exog=x).fit()
-        ax.set_title(r"Week %i; $\hat{\beta}=%1.6f$, $r^2=%1.6f$"%(week_num+1,fit.params[0],fit.rsquared))
-        ax.set_xlabel(r"$\theta_2^T f_2(S)$ (Treatment Effect)")
-        ax.set_ylabel(r"$\pi_t(1  | S_t)$")
-        
-    fig.suptitle("Treatment Effect versus Action Probability, for varying weeks" + title_end, fontsize = 14)
+        x = tp.loc[tp.index[(tp.index / (7*t)).astype(int) == week_num]].dropna().values.flatten()
+        y = p.loc[p.index[(p.index / (7*t)).astype(int) == week_num]].dropna().values.flatten()
+        if x.shape[0] > 0:
+            sns.regplot(x=x, y=y, scatter_kws={"color": "blue","alpha":alpha*tp.shape[1] * 7 * 5/x.shape[0],'s':marker_size}, line_kws={"color": "black"}, ax=ax)
+            fit = sm.OLS(endog=y, exog=x).fit()
+            ax.set_title(r"Week %i; $\hat{\beta}=%1.6f$, $r^2=%1.6f$"%(week_num+1,fit.params[0],fit.rsquared))
+            ax.set_xlabel(r"$\theta_2^T f_2(S)$ (Treatment Effect)")
+            ax.set_ylabel(r"$\pi_t(1  | S_t)$")
+            
+    fig.suptitle("Treatment Effect versus Action Probability, for varying weeks"+ title_end, fontsize = 14)
 
 
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     
+    # Set unused axes as not visible (avoids tight_layout incompatibility with invisible axes in older versions of Matplotlib)
+    for week_num, ax in zip(range(max_day//7),axes.flatten()):
+        x = tp.loc[tp.index[(tp.index / (7*t)).astype(int) == week_num]].dropna().values.flatten()
+        if x.shape[0] == 0:
+            ax.set_visible(False)
+
     return fig
 
-# QM 14 Prob proportion equal to 0
-def plot_QM14(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, y_size = 5, x_size = 10, alpha = 0.005, title_end = "", pi_min = 0.1, pi_max = 0.8):
+# QM 15 Prob proportion equal to 0
+def plot_QM15(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, y_size = 5, x_size = 10, alpha = 0.005, title_end = "", pi_min = 0.1, pi_max = 0.8):
     ''' Time series of probs (\pi_t(1 | S_t)) for all t, 25/50/75 quantiles and mean
     '''
     fig, ax = plt.subplots(figsize = (x_size, y_size))
@@ -497,7 +518,7 @@ def plot_QM14(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, 
     converged.mean(axis = 1).plot(ax = ax, alpha = 1, color = "k")
         
     ax.set_title("Proportion of Users with Clipped Probabilities over Time" + str(title_end))
-    ax.set_ylabel(r"$\pi_t(1  | S_t) = \pi_{min}$ or $\pi_max$")
+    ax.set_ylabel(r"$\pi_t(1  | S_t) = \pi_{min}$ or $\pi_{max}$")
     ax.set_xlabel("t (Decision Point)")
     
     minor_xticks = np.arange(0, converged.shape[0], 5)
@@ -505,12 +526,13 @@ def plot_QM14(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, 
     ax.set_xticks(minor_xticks, minor = True)
     ax.grid(which = 'minor', alpha = 0.3)
 
+
     return fig
 
 
 
-# QM 15 Prob difference from convergence
-def plot_QM15(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, y_size = 5, x_size = 10, alpha = 0.005, title_end = "", pi_min = 0.1, pi_max = 0.8):
+# QM 16 Prob difference from convergence
+def plot_QM16(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, y_size = 5, x_size = 10, alpha = 0.005, title_end = "", pi_min = 0.1, pi_max = 0.8):
     ''' Time series of distance from convergence min(|prob - pi_min|,|prob - pi_max|) for all t, 25/50/75 quantiles and mean
     '''
     fig, ax = plt.subplots(figsize = (x_size, y_size))
@@ -537,6 +559,7 @@ def plot_QM15(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, 
     ax.set_xlabel("t (Decision Point)")
 
     return fig
+
 
 
 

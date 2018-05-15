@@ -1,0 +1,117 @@
+%!TEX root = ../thesis.tex
+\begin{savequote}[75mm]
+My last piece of advice to the degenerate slot player who thinks he can beat the one-armed bandit consists of four little words: It can't be done.
+\qauthor{John Scarne}
+\end{savequote}
+
+\chapter{Contextual Multi-armed Bandits}
+
+\newthought{There is a fundamental trade-off} between the accuracy of a trained model versus the amount of time necessary to train the model in reinforcement learning.  Some RL techniques train incredibly precise and accurate models, such as through use of Markov decision processes in \citet{Sutton1998}, but require immense amounts of data and time to train.   On the other hand, simply associating the reward distributions with actions as in the {\it multi-armed bandit problem} is quick to learn and can run off of minimal data.  However, this does not sufficiently personalize interventions for patients, especially in mHealth. To effectively personalize the treatment, the interventions must take into account contextual factors that have potential predictivity of the reward function; this is the setup of the {\it contextual bandit} problem, which is solved by the {\it Thompson Sampling} heuristic.
+
+\section{Contextual Bandits and Thompson Sampling}
+
+The most basic form of an action-reward learning problem is known as the multi-armed bandit problem, where an agent is presented $K$ choices at any time, each with their own reward distribution; an analogy is to place yourself in a row of $K$ slot machines, hence the name multi-armed bandit as a play on one-armed bandits, a nickname for slot machines operated by a single lever.
+
+The more complicated problem applicable in the HeartSteps setting is to assume that the reward distribution of taking any action depends on the contextual state in which the action is taken.  For every time step, the algorithm receives a context $S_{(t,d)}$, selects an action $A_{(t,d)}$ to play, and observes reward $R_{(t,d)+1}$.  How the algorithm selects the action is known as the {\it contextual bandit} problem. 
+
+The method through which actions are selected can be thought of as being in one of two phases at any given time: exploration of the reward functions as they associate with rewards, and exploitation once it has deemed to have learned the rewards well enough.  Two simple heuristics exemplifying each of the exploration and exploitation phases are the random and greedy heuristics.  The random algorithm always selects an action at random, while the greedy heuristic always selects the action maximizing the overall reward according to its own model; these can be combined into an algorithm known as $\varepsilon$-greedy, which with probability $\varepsilon$ selects a random action and otherwise greedily selects the maximal reward action.  
+
+
+\subsection{Thompson Sampling}
+
+A well-known Bayesian heuristic called Thompson Sampling melds these two phases together \citep{Agrawal2012}.  Thompson Sampling assumes that each reward function depends on the state, action, and a latent parameter that must be learned and updated using Bayesian learning; specifically, there are the following variables and distributions:
+\begin{enumerate}
+ 	\item The history $\mathcal{H}_{(t,d)}$ of associated contexts, actions, and states.
+ 	\item A distribution of the reward $P\left(R_{(t,d)+1} |  \Theta_{(t,d)}, S_{(t,d)}, A_{(t,d)} \right)$ dependent on the associated context and action as well as a parameter $\Theta_{(t,d)}$.
+ 	\item A prior on the parameter $P_\Theta$, along with posterior $P_\Theta\left(\theta | \mathcal{H}_{(t,d)}\right) \propto P_\Theta(\theta) P_{\mathcal{H}_{(t,d)}}\left(\mathcal{H}_{(t,d)} | \Theta_{(t,d)} \right)$.
+ \end{enumerate}
+
+The Thompson Sampling heuristic first samples a value $\hat{\Theta}$ of the parameter $\Theta$ according to its posterior at the time, then takes the action $A_{(t,d)}$ that maximizes the expected reward according to the reward distribution $P\left(R_{(t,d)+1} | \hat{\Theta},A_{(t,d)},S_{(t,d)}\right)$ based on the sampled $\hat{\Theta}$ and context $S_{(t,d)}$.  Upon observing the reward $R_{(t,d)+1}$, the new history $\mathcal{H}_{(t,d)}$ is used to update the posterior of $\Theta$, allowing for a new iteration.
+
+
+\tikzstyle{block} = [draw, fill=blue!20, rectangle, 
+    minimum height=3em, minimum width=4em]
+\tikzstyle{sum} = [draw, fill=blue!20, circle, node distance=3.5cm]
+\tikzstyle{input} = [coordinate]
+\tikzstyle{output} = [coordinate]
+\tikzstyle{pinstyle} = [pin edge={to-,black}]
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[auto, node distance=2.5cm,>=latex']
+    % We start by placing the blocks
+    \node [input, name=input] {};
+    \node [sum, right of=input] (sum) {};
+    \node [block, right of=sum] (controller) {{\footnotesize Update, Sample}};
+    \node [block, right of=controller, pin={[pinstyle]above:$S_{(t,d)}$},
+            node distance=3cm] (system) {{\footnotesize Select Action}};
+    % We draw an edge between the controller and system block to 
+    % calculate the coordinate u. We need it to place the measurement block. 
+    \draw [->] (controller) -- node[name=u] {$\hat{\Theta}$} (system);
+    \node [output, right of=system] (output) {};
+    \node [block, below of=u] (measurements) {{\footnotesize Observe Reward}};
+
+    % Once the nodes are placed, connecting them is easy. 
+    \draw [draw,->] (input) -- node {$P_{\Theta}, P(R | \Theta, A, S)$} (sum);
+    \draw [->] (sum) -- node {$\mathcal{H}_{(t,d)}$} (controller);
+    \draw [->] (system) -- node [name=y] {$A_{(t,d)}$}(output);
+    \draw [->] (y) |- (measurements);
+    \draw [->] (measurements) -| node[pos=0.95] {} 
+        node [near end] {$R_{(t,d)+1}$} (sum);
+\end{tikzpicture}
+
+\caption{Thompson Sampling heuristic for multi-armed contextual bandits}
+\label{Thompson Sampling for Contextual Bandits}
+\end{figure}
+
+One particular reward distribution is to assume a linear model on the created features, the baseline and the interaction terms.  Thus, if $S_{(t,d)}$ is our contextual feature, we create stacked feature vector $F_{(t,d)} = \begin{bmatrix} f_1(S_{(t,d)}) \\
+A_{(t,d)} \cdot f_2(S_{(t,d)})
+\end{bmatrix}$, where $f_1: \mathcal{S} \to \mathbb{R}^{p_1}$ linearly maps contextual feature vectors to a baseline feature set, and $f_2: \mathcal{S} \to \mathbb{R}^{p_2}$ linearly maps contextual feature vectors to an interaction set, which is multiplied by the associated binary action $A_{(t,d)}$.
+
+The reward then is assumed to be normally distributed as $R_{(t,d) + 1} \sim \mathcal{N}\left(F_{(t,d)}^T \Theta, \sigma^2\right)$, with some unobserved variable $\sigma^2$ that is part of the data generating process. \\
+
+
+In this project, we use variants of the Thompson Sampling algorithm. While other more popular heuristics exist, such as the Upper Confidence Bound (UCB) or parametric variants like the LinUCB \citep{Li2010}, there are several reasons we stick with Thompson Sampling.  First, it is very simple to implement and tune, having minimal internal parameters. Second, because of the non-deterministic action selection of Thompson Sampling, it is less liable to sub-optimal reward due to delayed effects.  These delayed effects are likely prevalent in HeartSteps, for example, occurring if a user is unable to act on an activity suggestion during the hour it is presented but will remember the missed suggestion for the rest of the day.  Finally, it is highly competitive with UCB-type algorithms and definitively better than $\varepsilon$-greedy algorithms, as experimentally shown by \citet{Chapelle2011}.
+
+% Balancing bias vs variance, exploration vs exploitation
+% Contextual Bandit: Thompson Sampling	   
+% Basic idea: introduce MAB problem; stochastic bandit
+% "The key difference between the contextual bandit setting and standard supervised learning is that only the reward of the chosen action is revealed. For example, after always choosing the same action several times in a row" (DudikEtAl11), other good intros
+% Bayesian approach: Thompson Sampling -- heuristic for MAB problems; use of prior for tuning learning rate
+
+
+\section{Application Survey of Contextual Bandits}
+
+Contextual bandits have not been applied in the emerging field of mobile healthcare, but have seen wide applications in other personalization recommendation-based systems, such as in display advertising services or personalization of daily news article selections.
+
+\citet{Li2011} explored contextual bandits with generalized linear models and showed success in offline evaluation on personalization of Yahoo! front page advertisement placements, while \citet{Chapelle2014} experimentally found Thompson Sampling to have lower regret results than LinUCB or $\varepsilon$-greedy approaches in Yahoo's Right Media Exchange (RMX)'s data, one of the largest exchanges between online publishers and advertisers.
+
+Although these approaches may be similarly applied to JITAI systems, the domain science is quite different.  While it is more important to maximize the total reward in advertising or individual rewards in news recommendation systems, mobile health requires careful application of learning algorithms.  The potential to do harm in healthcare is much higher than in the above fields, and patients cannot be interchangeably ignored to further the learning algorithm or increase the overall reward, especially in more sensitive sub-disciplines, such as drug testing.  As such, while we aim to personalize HeartSteps action suggestions to users, we also must be mindful of the price on unlucky users.
+
+
+% Survey of bandit algorithms, use in advertising
+% Uses?
+% Theoretical bounds? (Microsoft Paper)
+% Note similarities/differences
+% Care about reward in Advertisement setting, but more care about regret in mHealth – if bad suggestions, users can lose trust in JITAI, and disengage – could be worse in mHealth problems/settings with higher variance in reward (aka higher potential regret values), such as drug testing or more sensitive topics
+
+
+
+% This Project
+% Define problem setting
+% Overview of data, feature choices, interaction terms, regression data, etc
+% Touch on: availability, missing data, standardization, etc
+% Define regret, algorithm
+% Compare algorithm performance vs playing optimal arm
+% Use of Gaussian Process Prior
+% Assumption of rewards are independent over time not valid
+% So, can use this Gaussian Process to account for this
+% Technically, non-stationarity in reward function can be caused by latent effect of delayed rewards
+% Not factoring that in presently
+% Use of Probability clipping
+% Clip probability of action to range $[0.1,0.8]$
+% Intended effects: continuing to learn model based on contexts, as only get one reward, as well as serve to limit high numbers of interventions sent
+% Use of Action Centering
+% Description: center probability
+% Parsimony of 
+% Model is likely misspecified, and we don't have $r_t(1) -  r_t(0)$; can form unbiased estimate if using AC.  Also, baseline reward does not need to be accurately simulated

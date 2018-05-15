@@ -102,7 +102,7 @@ for run_through in range(num_run_through):
         # Update master_param_vals based on optimum #
         for param_val,sim_num_done in zip(param_space, range(sim_num-num_vals,sim_num)):
             regret_file = out_dir + "regret_simNum" + str(sim_num_done) + ".npy"
-            QM_file = fig_dir + "QM11_simNum" + str(sim_num_done) + ".png"
+            QM_file = fig_dir + "QM16_simNum" + str(sim_num_done) + ".png"
             
             # WAITING CODE ##
             wait_counter = 0
@@ -234,7 +234,7 @@ sim_param_vals.loc[sim_num,"25%"] = np.nanpercentile(np.nanmean(regret,axis=1), 
 sim_param_vals.loc[sim_num,"Median"] = np.nanpercentile(np.nanmean(regret,axis=1), 50)
 sim_param_vals.loc[sim_num,"75%"] = np.nanpercentile(np.nanmean(regret,axis=1), 75)
 sim_param_vals.loc[sim_num,"95%"] = np.nanpercentile(np.nanmean(regret,axis=1), 95)
-sim_param_vals.loc[38sim_num42,"Max"] = np.nanpercentile(np.nanmean(regret,axis=1), 100)
+sim_param_vals.loc[sim_num,"Max"] = np.nanpercentile(np.nanmean(regret,axis=1), 100)
 for param in params:
   sim_param_vals.loc[sim_num,param] = test_param_vals[param]
 

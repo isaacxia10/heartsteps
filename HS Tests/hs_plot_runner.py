@@ -63,3 +63,4 @@ plot_QM12(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).save
 plot_QM13(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM13_simNum" + str(sim_num) + ".png")
 plot_QM14(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM14_simNum" + str(sim_num) + ".png")
 plot_QM15(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM15_simNum" + str(sim_num) + ".png")
+plot_QM16(regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred).savefig(fig_dir + "QM16_simNum" + str(sim_num) + ".png")
