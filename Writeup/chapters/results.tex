@@ -33,31 +33,38 @@ One important note for figure \ref{Cumulative Regrets for all Bandit Variants} i
 
 \begin{figure}[h!]
 \includegraphics[width=1.3\textwidth,center]{figures/cum_regret_comparison_grouped.png}%
-\caption{Cumulative regrets for all Bandit Variants, lower regret indicates better performance. (Separated Batches in Figure \ref{Cumulative Regrets for all Bandit Variants, Separated by Batch})}
+\caption{Cumulative expected regrets for all Bandit Variants, lower regret indicates better performance. (Separated Batches in Figure \ref{Cumulative Regrets for all Bandit Variants, Separated by Batch})}
 \label{Cumulative Regrets for all Bandit Variants}
 \end{figure}
 
 
 \begin{figure}[H]
 \includegraphics[width=1.25\textwidth,center]{figures/boxplots_muer.png}%
-\caption{Boxplots of MUER for all Bandit Variants, sorted by mean $MUER$.  Mean in Green, Median in Orange.  Lower means and lower variance indicate better performance.  Variance Decomposition shown in label under each Variant name: $\langle\textit{Total Var}\rangle = \langle\textit{Within Var}\rangle + \langle\textit{Between Var}\rangle$}
+\caption{Boxplots of MUER (Expected Regret) for all Bandit Variants, sorted by mean $MUER$.  Mean in Green, Median in Orange.  Lower means and lower variance indicate better performance.}
 \label{Boxplots of MUER for all Bandit Variants, sorted by mean MUER}
+\end{figure}
+\begin{figure}[H]
+\includegraphics[width=1.25\textwidth,center]{figures/boxplots_muar.png}%
+\caption{Boxplots of MUAR (Actual Regret) for all Bandit Variants, sorted by mean $MUAR$.  Mean in Green, Median in Orange.  Lower means and lower variance indicate better performance.}
+\label{Boxplots of MUAR for all Bandit Variants, sorted by mean MUAR}
 \end{figure}
 
 
 
 \begin{figure}[H]
-\includegraphics[width=1.35\textwidth,center]{figures/totalregrethists.png}%
-\caption{Histogram of all users' total regrets for all Bandit Variants, lower regrets indicate better performance.}
+\includegraphics[width=1.3\textwidth,center]{figures/totalregrethists.png}%
+\caption{Histogram of all users' total expected regrets for all Bandit Variants, lower regrets indicate better performance.}
 \label{Histogram of all Users' Total Regrets for all Bandit Variants}
 \end{figure}
 
 \clearpage
 
-\subsection{$MUER$ Variance Decomposition}
+\subsection{$MUER$ and $MUAR$ Variance Decomposition}
 \label{Variance Decomposition}
 
-We study the decompsition of the Total Variance in simulated $MUER$ into Within-User Variance and Betweeen-User Variance.  As we bootstrapped to obtain simulation users, we can reindex to match each simulation user with the $i$-th trial for real user $n$.  Let $Num(n)$ denote the number of times user $n$ was sampled within our set of simulation users.
+We study the decompsition of the Total Variance in simulated $MUER$ as well as $MUAR$ into Within-User Variance and Betweeen-User Variance.  As we bootstrapped to obtain simulation users, we can reindex to match each simulation user with the $i$-th trial for real user $n$.  Let $Num(n)$ denote the number of times user $n$ was sampled within our set of simulation users.
+
+For the following calculations and equations, we only write $MUER$; calculations and equations corresponding to $MUAR$ are identical.
 
 As we reindex, we denote that simulation $i$ for user $n$ has $MUER$ as $MUER_{n,i}$.  Then, the mean $MUER$ for user $n$ is computed by averaging all $Num(n)$ simulation trials, which we denote as $\overline{MUER}_{n}$.  Finally, we can denote the overall weighted mean across all users as $\overline{MUER}$, which is computed by weighting each user's mean MUER by $Num(n)$.  Recalling that $N = 37$ is the number of real users from the original HeartSteps v1 study while $2500$ is the number of bootstrapped simulation users, we summarize our decompsitions as such:
 
@@ -69,39 +76,83 @@ As we reindex, we denote that simulation $i$ for user $n$ has $MUER$ as $MUER_{n
 \sigma^2_{between} &:=  \frac{1}{N} \sum_{n=1}^{N} \left(\overline{MUER}_{n} - \overline{MUER} \right)^2
 \end{align}
 
-In table \ref{Variance Decomposition Table}, we report the simulation results; these are also depicted in the boxplots of figure \ref{Boxplots of MUER for all Bandit Variants, sorted by mean MUER}.
 
-  \begin{table}[H]
+In tables \ref{MUER Variance Decomposition Table} and \ref{MUAR Variance Decomposition Table}, we report the simulation results for both the $MUER$ and $MUAR$; that is, the expected regret as well as actual regret.  Note that the Within-user expected regrets for Random tests are negligible, as there is no randomization between different runs of the same user for the $MUER$.
+
+\begin{table}[H]
 \centering
 \begin{tabular}{llrrr}
 \toprule
-{} &  Batch &  Total var &  Within var &  Between var \\
+           {} &  Batch &  Total Var &    Within Var &  Between Var \\
 \midrule
-ac             &   Test &   2.661305 &    1.854323 &     0.806983 \\
-No Features    &   Test &   2.804786 &    1.856737 &     0.948049 \\
-pc             &   Test &   3.144949 &    2.359168 &     0.785780 \\
-small          &   Test &   3.162685 &    2.706956 &     0.455729 \\
-fc pc          &   Test &   3.358141 &    2.414217 &     0.943925 \\
-ac fc          &   Test &   3.382839 &    1.980111 &     1.402729 \\
-ac fc pc       &   Test &   3.385391 &    2.016630 &     1.368761 \\
-fc             &   Test &   3.407053 &    2.486476 &     0.920577 \\
-ac fc pc small &   Test &   3.504155 &    2.074450 &     1.429705 \\
-ac pc          &   Test &   6.071459 &    0.486644 &     5.584816 \\
-No Features    &  Train &   2.523148 &    1.848379 &     0.674769 \\
-ac fc          &  Train &   2.592400 &    1.728600 &     0.863799 \\
-ac fc pc       &  Train &   3.062984 &    2.010644 &     1.052340 \\
-fc             &  Train &   3.088712 &    2.424037 &     0.664676 \\
-small          &  Train &   3.097342 &    2.599052 &     0.498290 \\
-fc pc          &  Train &   3.123756 &    2.280590 &     0.843166 \\
-ac fc pc small &  Train &   3.222406 &    1.889396 &     1.333010 \\
-ac             &  Train &   3.239059 &    2.276554 &     0.962505 \\
-pc             &  Train &   3.334281 &    2.360475 &     0.973806 \\
-ac pc          &  Train &   3.719548 &    0.524511 &     3.195038 \\
+         Random &   Test &   0.000307 &  4.695738e-34 &     0.000307 \\
+          small &   Test &   0.000917 &  0.000812 &     0.000104 \\
+    fc pc small &   Test &   0.001176 &  0.000460 &     0.000715 \\
+         fc pc  &   Test &   0.001304 &  0.000818 &     0.000485 \\
+ ac fc pc small &   Test &   0.001347 &  0.000863 &     0.000483 \\
+      ac fc pc  &   Test &   0.001354 &  0.000806 &     0.000548 \\
+            pc  &   Test &   0.001521 &  0.001334 &     0.000186 \\
+         ac pc  &   Test &   0.001638 &  0.001535 &     0.000102 \\
+            fc  &   Test &   0.002583 &  0.001601 &     0.000981 \\
+    No Features &   Test &   0.002969 &  0.002753 &     0.000216 \\
+            ac  &   Test &   0.003017 &  0.002951 &     0.000066 \\
+         ac fc  &   Test &   0.003046 &  0.002032 &     0.001013 \\
+\midrule
+         Random &  Train &   0.000318 &  6.326872e-34 &     0.000318 \\
+    fc pc small &  Train &   0.001028 &  0.000515 &     0.000513 \\
+ ac fc pc small &  Train &   0.001152 &  0.000808 &     0.000343 \\
+      ac fc pc  &  Train &   0.001225 &  0.000804 &     0.000421 \\
+         fc pc  &  Train &   0.001240 &  0.000771 &     0.000469 \\
+          small &  Train &   0.001399 &  0.001066 &     0.000333 \\
+            pc  &  Train &   0.001611 &  0.001424 &     0.000187 \\
+         ac pc  &  Train &   0.001768 &  0.001682 &     0.000086 \\
+         ac fc  &  Train &   0.002244 &  0.001720 &     0.000524 \\
+            fc  &  Train &   0.002401 &  0.001673 &     0.000727 \\
+            ac  &  Train &   0.003608 &  0.003501 &     0.000107 \\
+    No Features &  Train &   0.003773 &  0.003434 &     0.000338 \\
 \bottomrule
 \end{tabular}
-\caption{Variance decomposition into Within-User and Between-User Variance, averaged across $k = 3$ split batches.}
-\label{Variance Decomposition Table}
+\caption{MUER (Expected Regret) Variance decomposition into Within-User and Between-User Variance, averaged across $k = 3$ split batches.}
+\label{MUER Variance Decomposition Table}
 \end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{llrrr}
+\toprule
+           {} &  Batch &  Total Var &  Within Var &  Between Var \\
+\midrule
+          small &   Test &   0.001046 &    0.000945 &     0.000101 \\
+    fc pc small &   Test &   0.001254 &    0.000547 &     0.000707 \\
+         fc pc  &   Test &   0.001408 &    0.000923 &     0.000485 \\
+ ac fc pc small &   Test &   0.001486 &    0.001006 &     0.000479 \\
+      ac fc pc  &   Test &   0.001492 &    0.000946 &     0.000545 \\
+            pc  &   Test &   0.001680 &    0.001496 &     0.000185 \\
+         ac pc  &   Test &   0.001825 &    0.001723 &     0.000102 \\
+            fc  &   Test &   0.002652 &    0.001672 &     0.000980 \\
+    No Features &   Test &   0.003092 &    0.002879 &     0.000213 \\
+         ac fc  &   Test &   0.003112 &    0.002097 &     0.001015 \\
+            ac  &   Test &   0.003150 &    0.003082 &     0.000068 \\
+         Random &   Test &   0.495572 &    0.110687 &     0.384885 \\
+\midrule
+    fc pc small &  Train &   0.001138 &    0.000629 &     0.000510 \\
+ ac fc pc small &  Train &   0.001295 &    0.000951 &     0.000344 \\
+         fc pc  &  Train &   0.001364 &    0.000901 &     0.000464 \\
+      ac fc pc  &  Train &   0.001374 &    0.000951 &     0.000423 \\
+          small &  Train &   0.001568 &    0.001234 &     0.000334 \\
+            pc  &  Train &   0.001780 &    0.001591 &     0.000189 \\
+         ac pc  &  Train &   0.001980 &    0.001889 &     0.000091 \\
+         ac fc  &  Train &   0.002295 &    0.001769 &     0.000526 \\
+            fc  &  Train &   0.002489 &    0.001761 &     0.000728 \\
+            ac  &  Train &   0.003765 &    0.003657 &     0.000109 \\
+    No Features &  Train &   0.003933 &    0.003595 &     0.000338 \\
+         Random &  Train &   0.501137 &    0.112222 &     0.388915 \\
+\bottomrule
+\end{tabular}
+\caption{MUAR (Actual Regret) Variance decomposition into Within-User and Between-User Variance, averaged across $k = 3$ split batches.}
+\label{MUAR Variance Decomposition Table}
+\end{table}
+
 
 \clearpage
 
@@ -109,7 +160,7 @@ ac pc          &  Train &   3.719548 &    0.524511 &     3.195038 \\
 
 The presence of action centering does not greatly affect many quality metrics.  The $MUER$ variance slightly increases with the presence of this feature.
 
-One observation is found in \ref{QM11train}, we see that the naked variant and the variant with just action centering differ in the fact that the $95\%$ and $75\%$ percentiles for the $\Theta$ MSE is markedly smaller.  In particular, we observe that this does not happen with adding just one of any of the other features, suggesting that lone action centering does well to mitigate poor training as compared to the others.  However, this benefit is highly dampened when comparing the full variant with and without action centering.
+One observation is found in Quality Metric 14, we see that the naked variant and the variant with just action centering differ in the fact that the $95\%$ and $75\%$ percentiles for the $\Theta$ MSE is markedly smaller.  In particular, we observe that this does not happen with adding just one of any of the other features, suggesting that lone action centering does well to mitigate poor training as compared to the others.  However, this benefit is highly dampened when comparing the full variant with and without action centering.
 
 
 \subsection{Feedback Controller}

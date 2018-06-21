@@ -8,7 +8,7 @@ import sys
 
 
 '''
-5/2/18
+5/18/18
 Read in:
 '''
 # python hs_test_runner.py <job_num> <out_dir> <data_loc_pref> <param_loc> <final_flag>
@@ -61,8 +61,7 @@ with open(param_loc + "/params" + str(job_num) + ".yaml") as f:
 locals().update(params)
 
 
-# Generative Model fit
-
+## Generative Model fit ##
 
 #Create a reward function from true coefficients, with residuals non-mandatory
 def reward_func_general(S, A, coef0, coef1, f_baseline, f_interact, resid = None):
@@ -85,8 +84,7 @@ def reward_func_general(S, A, coef0, coef1, f_baseline, f_interact, resid = None
 
 
 
-## Creating Simulations
-
+## Creating Simulations ##
 
 
 # Counts from HS 1
@@ -124,31 +122,6 @@ else:
 
 
 
-
-# ###############
-# ## Non-split ##
-# ###############
-# resids, Thetas_fit, resid_model = resid_regression(N, T, t, nBaseline, nInteract, f_baseline_identity, f_interact_identity, R, A, S)
-# resids_new, A_new, S_new = sample_sim_users(resids, A, S, N_sim, T, t)
-# I_new = np.expand_dims(~np.isnan(S_new).any(axis=-1),-1).astype(int) #
-
-
-
-# resid_sig2 = np.nanvar(resids)
-# prior_mean = Thetas_fit
-
-
-
-# prior_mdl = model(np.expand_dims(prior_mean,1), np.eye(nInteract+nBaseline) * prior_cov_mult)
-# fc_params = [lamb, int(N_c_mult*T_c), T_c]
-
-
-# # sim_start = datetime.datetime.now()
-# # reward_exp, reward_0, reward_1, prob, action, fc_invoked, bandit_mean, bandit = run_simulation(coef0 = Thetas_fit[4:12], coef1 = Thetas_fit[0:4], S_sim = S_new, I_sim = I_new, resids_sim = resids_new, f_baseline=f_baseline_identity, f_interact=f_interact_identity, reward_func = reward_func_identity, fc_params = fc_params, prior_model = prior_mdl, gamma = gamma, sigma2 = resid_sig2*sig2_mult, seed=sim_seed)
-# reward_exp, reward_0, reward_1, prob, action, fc_invoked, bandit = run_simulation(coef0 = Thetas_fit[4:12], coef1 = Thetas_fit[0:4], S_sim = S_new, I_sim = I_new, resids_sim = resids_new, f_baseline=f_baseline_identity, f_interact=f_interact_identity, reward_func = reward_func_identity, fc_params = fc_params, prior_model = prior_mdl, gamma = gamma, sigma2 = resid_sig2*sig2_mult, seed=sim_seed)
-
-
-
 ##################################
 ## Split train and test batches ##
 ##################################
@@ -168,20 +141,10 @@ if not train:
     # Use S,R,A from test once we've obtained the train Thetas_fit
     S_train,R_train,A_train = test_zip[batch_num]
     resids_train = resid_regression_test(S_train.shape[0], T, t, nBaseline_identity, nInteract_identity, f_baseline_identity, f_interact_identity, R_train.squeeze(), A_train, S_train, Thetas_fit_train)
-    # np.save("/n/home02/isaacxia/Iter_test/resids_train.npy", resids_train)
-    # np.save("/n/home02/isaacxia/Iter_test/S_train.npy", S_train)
-    # np.save("/n/home02/isaacxia/Iter_test/R_train.npy", R_train)
-    # np.save("/n/home02/isaacxia/Iter_test/A_train.npy", A_train)
-
 
 
 resids_new_train, A_new_train, S_new_train = sample_sim_users(resids_train, A_train, S_train, N_sim, T, t, seed = split_seed)
 I_new_train = np.expand_dims(~np.isnan(S_new_train).any(axis=-1),-1).astype(int) #
-
-# np.save("/n/home02/isaacxia/Iter_test/I_new_train", I_new_train)
-# np.save("/n/home02/isaacxia/Iter_test/S_new_train", S_new_train)
-# np.save("/n/home02/isaacxia/Iter_test/A_new_train", A_new_train)
-
 
 
 
@@ -198,22 +161,16 @@ prior_mdl = model(np.expand_dims(prior_mean,1), np.eye(nInteract+nBaseline) * pr
 fc_params = [lamb, int(N_c_mult*T_c), T_c]
 
 
-# sim_start = datetime.datetime.now()
-# reward_exp, reward_0, reward_1, prob, action, fc_invoked, bandit_mean, bandit = run_simulation(coef0 = Thetas_fit_train[4:12], coef1 = Thetas_fit_train[0:4], S_sim = S_new_train, I_sim = I_new_train, resids_sim = resids_new_train, f_baseline=f_baseline_identity, f_interact=f_interact_identity, reward_func = reward_func_identity, fc_params = fc_params, prior_model = prior_mdl, gamma = gamma, sigma2 = resid_sig2*sig2_mult, seed=sim_seed)
-
-regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, bandit = run_simulation(coef0 = Thetas_fit_train[nInteract_identity:nInteract_identity+nBaseline_identity], coef1 = Thetas_fit_train[0:nInteract_identity], nInteract = nInteract, nBaseline = nBaseline, S_sim = S_new_train, I_sim = I_new_train, resids_sim = resids_new_train, f_baseline=f_baseline, f_interact=f_interact, f_baseline_identity=f_baseline_identity, f_interact_identity=f_interact_identity, reward_func = reward_func_general, fc_params = fc_params, prior_model = prior_mdl, gamma = gamma, sigma2 = resid_sig2*sig2_mult, seed=sim_seed, ac_flag = ac_flag, fc_flag = fc_flag, pc_flag = pc_flag, Thetas_fit_bandit = Thetas_fit_bandit_train)
+regret, prob, action, opt, fc_invoked, theta_mse, treatment_pred, actual_regret, bandit = run_simulation(coef0 = Thetas_fit_train[nInteract_identity:nInteract_identity+nBaseline_identity], coef1 = Thetas_fit_train[0:nInteract_identity], nInteract = nInteract, nBaseline = nBaseline, S_sim = S_new_train, I_sim = I_new_train, resids_sim = resids_new_train, f_baseline=f_baseline, f_interact=f_interact, f_baseline_identity=f_baseline_identity, f_interact_identity=f_interact_identity, reward_func = reward_func_general, fc_params = fc_params, prior_model = prior_mdl, gamma = gamma, sigma2 = resid_sig2*sig2_mult, seed=sim_seed, ac_flag = ac_flag, fc_flag = fc_flag, pc_flag = pc_flag, Thetas_fit_bandit = Thetas_fit_bandit_train)
 
 
 #################
 ## Output Data ##
 #################
 
-# datNames = ["reward_exp","reward_0","reward_1","prob","action","fc_invoked","bandit_mean"]
-# dats = [reward_exp,reward_0,reward_1,prob,action,fc_invoked,bandit_mean]
 
-# Without bandit_mean
-datNames = ["regret","prob","action","opt","fc_invoked","theta_mse","treatment_pred"]
-dats = [regret,prob,action,opt,fc_invoked,theta_mse,treatment_pred]
+datNames = ["regret","prob","action","opt","fc_invoked","theta_mse","treatment_pred","actual_regret"]
+dats = [regret,prob,action,opt,fc_invoked,theta_mse,treatment_pred, actual_regret]
 
 for dat, datName in zip(dats, datNames):
     np.save(out_dir + datName + "_simNum" + str(sim_num) + ".npy", dat)

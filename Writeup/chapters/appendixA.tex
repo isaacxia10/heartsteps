@@ -18,121 +18,38 @@
 \label{Cumulative Regrets for all Bandit Variants, Separated by Batch}
 \end{figure}
 
+\clearpage
 
 \section{Quality Metric Figures}
 \label{Quality Metric Figures}
 
-	\ifdraft
-	Turn off Draft mode to display figures!
-	\else
+See additional {\bf Plots} folder to see Quality Metric Figures.  For each of the three batches $(1,2,3)$, the plots have been separated into Train and Test groups, for a total of $6$ total folders in the main {\bf Plots}.  Within each of the $6$ folders, there are $11$ subfolders, each named ``variant\_****'', where each of the * represent either $0$ or $1$; these are results for each variant of the Bandit for one of the three train/test batches.
 
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM2train.png}%
-	\caption{Cumulative Regret over Decision Point for All Users in Optimal Training Batches}
-	\label{QM2train}
-	\end{figure}
+\begin{itemize}
+	\item The first number indicates the use of action centering (ac); $1$ indicates that ac was used, $0$ indicates ac was not used.
+	\item The second number indicates the use of a feedback controller (fc); $1$ means on, $0$ means off.
+	\item The third number indicates the use of probability clipping (pc); $1$ means on, $0$ means off.
+	\item The fourth number indicates the use of the Small model (small); $0$ means that the Full model was used, and $1$ means that the Small model was used.
+\end{itemize}
 
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM2test.png}%
-	\caption{Cumulative Regret over Decision Point for All Users in Testing Batches}
-	\label{QM2test}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM3train.png}%
-	\caption{Action Probability over Users in Optimal Training Batches}
-	\label{QM3train}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM3test.png}%
-	\caption{Action Probability over Users in Testing Batches}
-	\label{QM3test}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM5train.png}%
-	\caption{|Action Probability - Optimal Probability| Averaged over all $t$ for $7500$ Users in Optimal Training Batches}
-	\label{QM5train}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM5test.png}%
-	\caption{|Action Probability - Optimal Probability| Averaged over all $t$ for $7500$ Users in Testing Batches}
-	\label{QM5test}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM6train.png}%
-	\caption{Number of Actions per Day across all Users in Optimal Training Batches}
-	\label{QM6train}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM6test.png}%
-	\caption{Number of Actions per Day across all Users in Testing Batches}
-	\label{QM6test}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM7train.png}%
-	\caption{Number of Actions per Day for Users in Optimal Training Batches}
-	\label{QM7train}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM7test.png}%
-	\caption{Number of Actions per Day for Users in Testing Batches}
-	\label{QM7test}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM8train.png}%
-	\caption{Number of Feedback Controllings per Day across all Users in Optimal Training Batches}
-	\label{QM8train}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM8test.png}%
-	\caption{Number of Feedback Controllings per Day across all Users in Testing Batches}
-	\label{QM8test}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM9train.png}%
-	\caption{Number of Feedback Controllings per Day for Users in Optimal Training Batches}
-	\label{QM9train}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM9test.png}%
-	\caption{Number of Feedback Controllings per Day for Users in Testing Batches}
-	\label{QM9test}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM11train.png}%
-	\caption{Bandit Model $\Theta$ MSE for All Users in Optimal Training Batches}
-	\label{QM11train}
-	\end{figure}
-
-	\begin{figure}[H]
-	\includegraphics[width=1.5\textwidth,center]{figures/QM11test.png}%
-	\caption{Bandit Model $\Theta$ MSE for All Users in Testing Batches}
-	\label{QM11test}
-	\end{figure}
-
-	\fi
+Inside each subfolder, there are $19$ Quality Metric plots, all of whose descriptions can be found in table \ref{QM Table}.
 
 
 
-\section{Parameter Tuning vs $MUER$ Figures}
-
-All parameters were tuned in the given range from table \ref{Parameter Optimization Table}, with $160$ steps in between ($160$ chosen to leverage available dedicated \href{https://www.rc.fas.harvard.edu/}{Odyssey Research} cluster computing cores).
+\section{Parameter Tuning vs MUER Figures}
 
 
-\subsection{$MUER$ Minimization Parameter Optimization}
+
+In this section, we present the effect of varying values of the tuning parameters on $MUER$ mean and standard deviation, for the standard bandit (ac fc pc), with optimization using $MUER$ mean minimization as well as using the StdDev cutoff method.  For each optimization method, there are $4$ figures, corresponding with the number of times we cycled through all of the tuning parameters performing a parameter sweep optimization.  \\
+
+Within each figure are two plots.  The first plot shows the $MUER$ mean, along with a red dashed line of best linear fit, with the fitted line's equation printed in red.  The second plot shows the $MUER$ standard deviation.  In both plots, the chosen value of the parameter is given by the vertical purple dotted line, whether by $MUER$ mean minimization or using a StdDev cutoff.  
+
+All parameters were tuned in the given range from table \ref{Parameter Optimization Table}, with $160$ steps in between ($160$ chosen to leverage available dedicated \href{https://www.rc.fas.harvard.edu/}{Odyssey Research} cluster computing cores in parallel computation).  
+
+
+% \subsection{$MUER$ Minimization Parameter Optimization}
 \label{MUER Minimization Parameter Optimization}
+
 
 	\ifdraft
 	Turn off Draft mode to display figures!
@@ -210,8 +127,8 @@ All parameters were tuned in the given range from table \ref{Parameter Optimizat
 
 
 
-\subsection{Standard Deviation Cutoff Parameter Optimization}
-	\label{Standard Deviation Cutoff Parameter Optimization}
+% \subsection{Standard Deviation Cutoff Parameter Optimization}
+% 	\label{Standard Deviation Cutoff Parameter Optimization}
 
 	\ifdraft
 	Turn off Draft mode to display figures!

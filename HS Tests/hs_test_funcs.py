@@ -4,9 +4,9 @@ import statsmodels.api as sm
 from scipy.stats import norm
 
 
-#################
-# Test Bed 5/4 #
-#################
+#######################
+# Test Functions 5/18 #
+#######################
 # HS Analysis Functions
 
 ### Aux Functions for reading two different .csv files ###
@@ -405,56 +405,6 @@ def sample_sim_users(resids, A, S, N_new, T, t, seed = None):
 
 
 
-# #Create a reward function from true coefficients, with residuals non-mandatory
-# def reward_func_identity(S, A, coef0, coef1, resid = None, single_dim = True):
-#     '''Basic reward function, can edit for different generative models.
-#     Identity on baseline and interaction terms.
-#     Works for multidimensional eta, a, and s, so long as they are of same multidimension.
-#     Assumes s has first element as bias for the regression.
-    
-#     Resid must be passed in if not single dim.
-#     If single dim, can speed out without np.take.'''
-    
-#     nInteract = len(coef1)
-    
-#     if single_dim:
-#         predictors = np.concatenate([A * S[1:1+nInteract], S], 0)
-#     else:
-#         predictors = np.concatenate([A * np.take(S,range(1,1+nInteract),-1), S], 0)
-    
-#     Theta = np.concatenate([coef1, coef0])
-    
-#     if resid is None:
-#         resid = 0
-        
-#     return(resid + np.dot(predictors, Theta))
-
-
-# #Create a reward function from true coefficients, with residuals non-mandatory
-# def reward_func_small(S, A, coef0, coef1, resid = None, single_dim = True):
-#     '''Basic reward function, can edit for different generative models.
-#     Identity on baseline and interaction terms.
-#     Works for multidimensional eta, a, and s, so long as they are of same multidimension.
-#     Assumes s has first element as bias for the regression.
-    
-#     Resid must be passed in if not single dim.
-#     If single dim, can speed out without np.take.'''
-    
-#     nInteract = len(coef1)
-    
-#     if single_dim:
-#         predictors = np.concatenate([A * S[1:1+nInteract], S], 0)
-#     else:
-#         predictors = np.concatenate([A * np.take(S,range(1,1+nInteract),-1), S], 0)
-    
-#     Theta = np.concatenate([coef1, coef0])
-    
-#     if resid is None:
-#         resid = 0
-        
-#     return(resid + np.dot(predictors, Theta))
-
-
 
 #Create a reward function from true coefficients, with residuals non-mandatory
 def reward_func_general(S, A, coef0, coef1, f_baseline, f_interact, resid = None):
@@ -662,11 +612,8 @@ class ContextBandit:
         self.daystart_model.mu = current_model.mu.copy()
         self.daystart_model.Sigma = current_model.Sigma.copy()
         
-########
 
 #####################################################################
-#A simulation of above standard model.
-
 #A simulation of above standard model.
 
 
@@ -696,19 +643,20 @@ def run_simulation(coef0, coef1, S_sim, I_sim, resids_sim, reward_func, prior_mo
     assert t == S_sim.shape[2]
     
     #creating variables for saving history of what we do
-    # reward_exp = np.empty((N, T, t)) # Bandit reward
     regret = np.empty((N, T, t))
     prob  = np.empty((N, T, t))
     action = np.empty((N, T, t))
     opt = np.empty((N, T, t))
     fc_invoked = np.empty((N, T, t))
     treatment_pred = np.empty((N, T, t))
+    actual_regret = np.empty((N, T, t))
     regret.fill(np.nan)
     prob.fill(np.nan)
     action.fill(np.nan)
     opt.fill(np.nan)
     fc_invoked.fill(np.nan)
     treatment_pred.fill(np.nan)
+    actual_regret.fill(np.nan)
     
     seed_rand = np.random.RandomState(seed)
     
@@ -775,8 +723,13 @@ def run_simulation(coef0, coef1, S_sim, I_sim, resids_sim, reward_func, prior_mo
                 #Expected reward under bandit policy
                 rwdExp = prob[sim_user_index, day, dpt]*rwd1 + (1-prob[sim_user_index, day, dpt])*rwd0
 
-                #Regret is difference between optimal reward and the reward we got
-                regret[sim_user_index, day, dpt] = max(pc_params[0]*rwd1 + (1-pc_params[0])*rwd0, pc_params[1]*rwd1 + (1-pc_params[1])*rwd0) - rwdExp
+                #Optimal reward; we use probability clipped values even for variants without clipping, to allow for cross-variant comparisons of MUER
+                rwdOpt = max(pc_params[0]*rwd1 + (1-pc_params[0])*rwd0, pc_params[1]*rwd1 + (1-pc_params[1])*rwd0)
+
+                #Regret (Expected regret) is difference between optimal reward and the expected regre
+                regret[sim_user_index, day, dpt] = rwdOpt - rwdExp
+                #Actual regret is difference between optimal reward and our reward
+                actual_regret[sim_user_index, day, dpt] = rwdOpt - rwd[dpt]
 
                 opt[sim_user_index, day, dpt] = pc_params[1] * (rwd1 > rwd0) + pc_params[0] * (rwd1 <= rwd0)
 
@@ -787,5 +740,5 @@ def run_simulation(coef0, coef1, S_sim, I_sim, resids_sim, reward_func, prior_mo
                 bandit.update_model_daily(S_sim[sim_user_index, day], rwd, action[sim_user_index, day], prob[sim_user_index, day], I_sim[sim_user_index, day])
 
     #return reward_exp.reshape((N,T*t)), reward_0.reshape((N,T*t)), reward_1.reshape((N,T*t)), prob.reshape((N,T*t)), action.reshape((N,T*t)), fc_invoked.reshape((N, T*t)), bandit_covs.reshape((N,T*t, nInteract+nBaseline,nInteract+nBaseline)), bandit_means.reshape((N,T*t, nInteract+nBaseline)), bandit
-    return regret.reshape((N,T*t)), prob.reshape((N,T*t)), action.reshape((N,T*t)), opt.reshape((N, T*t)), fc_invoked.reshape((N, T*t)), theta_mse.reshape((N,T*t)), treatment_pred.reshape((N,T*t)), bandit
+    return regret.reshape((N,T*t)), prob.reshape((N,T*t)), action.reshape((N,T*t)), opt.reshape((N, T*t)), fc_invoked.reshape((N, T*t)), theta_mse.reshape((N,T*t)), treatment_pred.reshape((N,T*t)), actual_regret.reshape((N,T*t)), bandit
 

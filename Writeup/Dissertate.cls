@@ -89,6 +89,7 @@
 \usepackage{bbm}
 \RequirePackage{xcolor}
 \usepackage{hyperref}
+\usepackage{longtable}
 \RequirePackage{url}
 \RequirePackage{amssymb}
 \usepackage{amsmath}
@@ -246,7 +247,7 @@
 	\vspace{12pt}
 	in partial fulfillment of the requirements\\
 	for the degree of\\ \@degree\\
-	in the subjects of\\ \@field\\
+	in the joint subjects of\\ \@field\\
 	\vspace{12pt}
 	\@university\\ \@universitycity, \@universitystate\\
 	\@degreemonth\ \@degreeyear}
@@ -317,6 +318,7 @@
     \begin{appendices}
         \include{chapters/appendixA}
         \include{chapters/appendixB}
+        \include{chapters/appendixC}
     \end{appendices}
     \input{endmatter/personalize}
     \clearpage

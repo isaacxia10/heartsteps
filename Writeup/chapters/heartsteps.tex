@@ -29,10 +29,12 @@ For the purposes of this project, we only consider the difference between sendin
 
 \subsection{HeartSteps Data and JITAI Notation}
 
-	We adopt the following notation as in \citet{Liao2015}, summarized in table \ref{Notation Table}.  Throughout, we refer to times as a tuple $(t,d)$ of day $1 \le t \le T$ and decision time point $1 \le d \le D = 5$, and use the notation $(t,d) + k$ as $k$ decision time points after the time point of $(t,d)$, so that $$\scriptstyle \scriptsize (t,d) + 1 = \begin{cases}
+	We adopt the following notation as in \citet{Liao2015}, summarized in table \ref{Notation Table}.  Throughout, we refer to times as a tuple $(t,d)$ of day $1 \le t \le T$ and decision time point $1 \le d \le D = 5$, and use the notation $(t,d) + k$ as $k$ decision time points after the time point of $(t,d)$, so that 
+
+	\begin{equation}\scriptstyle \scriptsize (t,d) + 1 = \begin{cases}
 (t,d+1);\ \  1 \le d \le 4 \\
 (t+1, 1); \ \ d = 5.
-\end{cases}$$
+\end{cases}\end{equation}
 	At every time point $(t,d)$ of day $1 \le t \le T$ and decision point $1 \le d \le D$, there is a contextual feature vector $S_{(t,d)} \in \mathcal{S}$ with $7$ elements, a chosen action $A_{(t,d)} \in \{0,1\}$ of activity suggestion, and the observed reward $R_{(t,d)+1} \in \mathbb{R}$.  
 	
 	Note that the reward $R_{(t,d)+1}$ has the subsequent time index, but results from observation of taking action $A_{(t,d)}$ in context $S_{(t,d)}$.  To summarize a history of the data, we denote the set of variables up until time $(t,d)$ as $\mathcal{H}_{(t,d)}\left\{S_{(t',d')}, A_{(t',d')}, R_{(t',d') + 1} \right\}_{(t',d') < (t,d)}$\label{HistorySet}.
